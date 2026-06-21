@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-serif: "Lora", "Georgia", serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-neutral-1050: #0a0a0a;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased text-neutral-800 dark:text-neutral-200 transition-colors duration-300;
+  }
+}
+
+/* Custom fine-line editorial divider styles */
+.editorial-grid {
+  border-color: var(--color-neutral-200);
+}
+@media (prefers-color-scheme: dark) {
+  .editorial-grid {
+    border-color: var(--color-neutral-800);
+  }
+}
+
+/* Smooth custom scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar tweaks */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 120, 0.2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 120, 120, 0.4);
+}

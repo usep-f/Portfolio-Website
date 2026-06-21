@@ -1,0 +1,6 @@
+{
+  "name": "Developer Portfolio",
+  "description": "A beautiful and sleek freelance developer portfolio website featuring smooth transitions, bento grids, and an interactive resume. Built with React, Tailwind, and motion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
