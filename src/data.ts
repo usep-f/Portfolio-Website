@@ -132,19 +132,3 @@ export const TIMELINE: TimelineItem[] = [
   }
 ];
 
-export const CLIENT_TESTIMONIALS = [
-  {
-    id: "t1",
-    quote: "Working with this developer was a game-changer. They transformed our sluggish platform into a lightning-fast showcase. Our customer conversion rate grew by 25% within weeks.",
-    author: "Elena Vance",
-    role: "Product Director at Novatek",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80"
-  },
-  {
-    id: "t2",
-    quote: "Packs rare technical depth with clean design sensibilities. The code was modular, readable, built exactly on spec, and checked in days ahead of schedule.",
-    author: "Marcus Brodie",
-    role: "Founder of SyncForge",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80"
-  }
-];

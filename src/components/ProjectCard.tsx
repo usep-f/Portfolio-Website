@@ -50,15 +50,11 @@ export default function ProjectsSection() {
       </div>
 
       {/* Grid mapping */}
-      <motion.div 
-        layout
-        className="grid grid-cols-1 md:grid-cols-2 gap-8"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <AnimatePresence mode="popLayout">
           {filteredProjects.map((project, index) => (
             <motion.div
-              layout
-              key={project.id}
+              key={`${selectedCategory}-${project.id}`}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 15 }}
@@ -132,7 +128,7 @@ export default function ProjectsSection() {
             </motion.div>
           ))}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       {/* Detail Showcase Lightbox Modal */}
       <AnimatePresence>
