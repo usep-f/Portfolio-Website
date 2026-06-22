@@ -85,6 +85,7 @@ const categoryColorStyles: Record<string, { gradient: string; text: string; shad
 import ProjectsSection from "./components/ProjectCard";
 import ContactForm from "./components/ContactForm";
 import BentoAbout from "./components/BentoAbout";
+import BentoMoreThanDev from "./components/BentoMoreThanDev";
 import ResumeModal from "./components/ResumeModal";
 import DynamicOrbitCarousel from "./components/DynamicOrbitCarousel";
 import CustomCursor from "./components/CustomCursor";
@@ -748,6 +749,34 @@ export default function App() {
             }}
           >
             <BentoAbout />
+          </motion.div>
+
+          {/* More than just development subsection */}
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+            }}
+            className="space-y-1.5 pt-8 pb-4 relative"
+          >
+            <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
+              More than just development
+            </h3>
+            <motion.div 
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
+            />
+          </motion.div>
+
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 25 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+            }}
+          >
+            <BentoMoreThanDev />
           </motion.div>
         </motion.section>
 
