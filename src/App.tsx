@@ -568,9 +568,6 @@ export default function App() {
               <span className="font-serif italic text-base font-semibold tracking-tight text-neutral-950 dark:text-white leading-none">
                 Joseph Umali
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-widest text-neutral-400 mt-0.5">
-                React Architect // Freelance
-              </span>
             </div>
           </motion.div>
 
@@ -653,17 +650,6 @@ export default function App() {
             {/* Left Content Column */}
             <div className="md:col-span-8 space-y-8">
               <div className="space-y-5">
-                <motion.div 
-                  variants={{
-                    hidden: { opacity: 0, y: 10 },
-                    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
-                  }}
-                  className="inline-flex items-center gap-2 border-b border-neutral-400 dark:border-pink-500 pb-1 text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-400 dark:text-pink-400 font-bold"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Independent UI Architecture</span>
-                </motion.div>
-
                 <TypedHeroHeading triggerKey={typingKey} />
 
                 <motion.p 
@@ -784,9 +770,6 @@ export default function App() {
             }}
             className="space-y-1.5 pb-4 relative"
           >
-            <span className="text-[10px] font-mono tracking-[0.2em] text-neutral-400 dark:text-neutral-500 uppercase font-bold">
-              Background Scope
-            </span>
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
               Creative Philosophy & Criteria
             </h3>
@@ -829,16 +812,10 @@ export default function App() {
             className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 relative"
           >
             <div className="space-y-1.5">
-              <span className="text-[10px] font-mono tracking-[0.2em] text-neutral-400 dark:text-neutral-500 uppercase font-bold">
-                Proven Output
-              </span>
               <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
                 Selected Work & Headless Solutions
               </h3>
             </div>
-            <p className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-              CACHED IN SYSTEM INDEX
-            </p>
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -877,9 +854,6 @@ export default function App() {
             }}
             className="space-y-1.5 pb-4 relative"
           >
-            <span className="text-[10px] font-mono tracking-[0.2em] text-neutral-400 dark:text-neutral-500 uppercase font-bold">
-              Technical Capabilities
-            </span>
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
               Engineered Stack & Standards
             </h3>
@@ -947,9 +921,6 @@ export default function App() {
             }}
             className="space-y-1.5 pb-4 relative"
           >
-            <span className="text-[10px] font-mono tracking-[0.2em] text-neutral-400 dark:text-neutral-500 uppercase font-bold">
-              Engineering Chronology
-            </span>
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
               Timeline of Shipped Value
             </h3>
@@ -1020,9 +991,6 @@ export default function App() {
             }}
             className="space-y-1.5 pb-4 relative"
           >
-            <span className="text-[10px] font-mono tracking-[0.2em] text-neutral-400 dark:text-neutral-500 uppercase font-bold">
-              Commission Proposal
-            </span>
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
               Initiate Dynamic Project Sprints
             </h3>

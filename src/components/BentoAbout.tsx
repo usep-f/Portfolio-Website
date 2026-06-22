@@ -27,11 +27,6 @@ export default function BentoAbout() {
               <MapPin className="w-3.5 h-3.5 text-neutral-400" />
               <span>San Francisco, CA & Remote</span>
             </span>
-            <span className="text-neutral-300 dark:text-neutral-800">|</span>
-            <span className="flex items-center gap-1.5">
-              <Laptop2 className="w-3.5 h-3.5 text-neutral-400" />
-              <span>Freelance Contractor</span>
-            </span>
           </div>
         </div>
 
