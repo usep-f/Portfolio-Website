@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from "motion/react";
+import { motion, AnimatePresence, useSpring, useTransform, useMotionValue, useScroll } from "motion/react";
 import {
   Sun,
   Moon,
@@ -90,6 +90,7 @@ import DynamicOrbitCarousel from "./components/DynamicOrbitCarousel";
 import CustomCursor from "./components/CustomCursor";
 import HeroAbstractBackground from "./components/HeroAbstractBackground";
 import CenterColumnGeometricBlobs from "./components/CenterColumnGeometricBlobs";
+import logo from "@/assets/logo.png";
 
 interface TypedHeroHeadingProps {
   triggerKey: number;
@@ -112,29 +113,6 @@ function TypedHeroHeading({ triggerKey }: TypedHeroHeadingProps) {
     setShowCursor(true);
   }, [triggerKey]);
 
-  // Monitor scroll to handle backspacing and preloaded forward typing
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      
-      // If user scrolls down past 120px, initiate a backspace sequence
-      if (currentScroll > 120) {
-        setIsTypingForward(false);
-      } 
-      // If user scrolls up and is close (within 300px), start typing forward
-      // This is the active "lazy / auto preload" mechanism that types ahead 
-      // before they can see an empty state!
-      else if (currentScroll <= 300) {
-        setIsTypingForward(true);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    // Check initial scroll on mount
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Run the typing interval
   useEffect(() => {
@@ -457,22 +435,24 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [activeSkillCat, setActiveSkillCat] = useState<"all" | "frontend" | "backend" | "tools" | "creative">("all");
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
   
   const [typingKey, setTypingKey] = useState(0);
-  const [isHeroOutOfView, setIsHeroOutOfView] = useState(false);
+
+  // Smooth hardware-accelerated scroll progress bar using motion springs
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   // Permanent profile photo link featuring a smiling headshot of a professional
-  const heroImage = "https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?q=80&w=600&auto=format&fit=crop";
+  const heroImage = "assets/Adobe Express - file.png";
 
-  // Track scroll progress
+  // Track scroll position for back to top button visibility
   useEffect(() => {
     const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        setScrollProgress((window.scrollY / totalScroll) * 100);
-      }
       setShowScrollTop(window.scrollY > 400);
     };
 
@@ -482,21 +462,6 @@ export default function App() {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Monitor scroll to replay the typing animation if we scroll far away and then scrollback to the top
-  useEffect(() => {
-    const handleScrollReplay = () => {
-      const currentScroll = window.scrollY;
-      if (currentScroll > 500) {
-        setIsHeroOutOfView(true);
-      } else if (currentScroll < 10 && isHeroOutOfView) {
-        setTypingKey((prev) => prev + 1);
-        setIsHeroOutOfView(false);
-      }
-    };
-    window.addEventListener("scroll", handleScrollReplay, { passive: true });
-    return () => window.removeEventListener("scroll", handleScrollReplay);
-  }, [isHeroOutOfView]);
 
   // Load and apply theme
   useEffect(() => {
@@ -545,36 +510,30 @@ export default function App() {
 
       {/* Dynamic Purple Bubble Gradient Background */}
       <DynamicPurpleBubblesBackground isDarkMode={isDarkMode} />
-      
       {/* Fixed Scroll Progress Indicator Bar */}
-      <div 
-        className="fixed top-0 left-0 h-[3px] bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-500 dark:to-pink-500 z-[100] transition-all duration-75 ease-out origin-left shadow-[0_1px_4px_rgba(236,72,153,0.2)]"
-        style={{ width: `${scrollProgress}%` }}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 h-[3px] bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-500 dark:to-pink-500 z-[100] origin-left shadow-[0_1px_4px_rgba(236,72,153,0.2)]"
+        style={{ scaleX }}
         id="scroll-progress-indicator"
       />
-      
       {/* Decorative Editorial Grid Line */}
       <div className="absolute inset-x-0 top-0 h-[10px] bg-neutral-900 dark:bg-gradient-to-r dark:from-violet-500 dark:to-pink-500 z-50" />
 
       {/* FIXED NAV BAR */}
       <header className="sticky top-0 z-40 w-full bg-[#fcfcfc]/60 dark:bg-[#080808]/60 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-900/50">
-        <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between relative">
           <motion.div 
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center space-x-3"
           >
-            <div className="w-9 h-9 rounded-none bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-500 dark:to-pink-500 flex items-center justify-center text-white dark:text-white font-serif text-lg font-bold shadow-sm">
-              U
+            <div className="w-10  h-10 flex items-center justify-center overflow-hidden">
+              <img src={logo} alt="Joseph Umali Brand Logo" className="w-full h-full object-contain" />
             </div>
-            <div className="flex flex-col">
-              <span className="font-serif italic text-base font-semibold tracking-tight text-neutral-950 dark:text-white leading-none">
-                Joseph Umali
-              </span>
-            </div>
+           
           </motion.div>
 
-          <nav className="hidden md:flex items-center space-x-2">
+          <nav className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center space-x-2">
             <a
               href="#about-section"
               className="px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-neutral-950 dark:hover:text-white transition"
@@ -639,8 +598,7 @@ export default function App() {
         <motion.section 
           className="pt-4 relative z-10 overflow-hidden p-6 md:p-10 rounded-2xl border border-neutral-200/40 dark:border-neutral-900/45 bg-[#fcfcfc]/40 dark:bg-[#080808]/40 shadow-sm"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, margin: "-10%" }}
+          animate="visible"
           variants={{
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
@@ -759,8 +717,7 @@ export default function App() {
           id="about-section"
           className="space-y-6 pt-4 relative z-10"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, margin: "-10%" }}
+          animate="visible"
           variants={{
             hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
@@ -778,8 +735,7 @@ export default function App() {
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: false }}
+              animate={{ scaleX: 1 }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -800,8 +756,7 @@ export default function App() {
           id="projects-section"
           className="space-y-6 pt-4 relative z-10"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, margin: "-10%" }}
+          animate="visible"
           variants={{
             hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
@@ -821,8 +776,7 @@ export default function App() {
             </div>
             <motion.div 
               initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: false }}
+              animate={{ scaleX: 1 }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -843,8 +797,7 @@ export default function App() {
           id="skills-section"
           className="space-y-6 pt-4 relative z-10"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, margin: "-10%" }}
+          animate="visible"
           variants={{
             hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
@@ -862,8 +815,7 @@ export default function App() {
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: false }}
+              animate={{ scaleX: 1 }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -910,8 +862,7 @@ export default function App() {
         <motion.section
           className="space-y-6 pt-4 relative z-10"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, margin: "-10%" }}
+          animate="visible"
           variants={{
             hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
@@ -929,8 +880,7 @@ export default function App() {
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: false }}
+              animate={{ scaleX: 1 }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -980,8 +930,7 @@ export default function App() {
           id="contact-section"
           className="space-y-6 pt-4 relative z-10"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, margin: "-10%" }}
+          animate="visible"
           variants={{
             hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
@@ -1002,8 +951,7 @@ export default function App() {
             </p>
             <motion.div 
               initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: false }}
+              animate={{ scaleX: 1 }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -1050,7 +998,6 @@ export default function App() {
             onClick={() => {
               window.scrollTo({ top: 0, behavior: "smooth" });
               setTypingKey((prev) => prev + 1);
-              setIsHeroOutOfView(false);
             }}
             className="fixed bottom-6 right-6 z-[100] px-4 py-3 bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-500 dark:to-pink-500 text-white dark:text-white border border-neutral-800 dark:border-pink-400 text-[10px] font-mono tracking-[0.2em] uppercase transition flex items-center gap-2 hover:bg-neutral-900 dark:hover:opacity-90 group cursor-pointer font-bold shadow-lg shadow-neutral-950/5 dark:shadow-pink-500/5 rounded-none"
             id="back-to-top-btn"
