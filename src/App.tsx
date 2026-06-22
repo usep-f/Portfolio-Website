@@ -583,7 +583,7 @@ export default function App() {
               id="view-cv-nav-btn"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>RESUME</span>
+              <span>Resume</span>
             </button>
           </div>
         </div>
@@ -621,7 +621,7 @@ export default function App() {
                   }}
                   className="text-sm md:text-base text-neutral-500 dark:text-neutral-400 max-w-2xl leading-relaxed font-sans"
                 >
-                  I shape interfaces that elevate digital interaction. I build rapid code structures on Vite, compile responsive headless client frameworks, and engineer custom dashboard systems with pristine typographic balance and responsive fidelity.
+                  I am a 4th-year Industrial Technology student from the Philippines. I build clean and responsive websites, design user interfaces, and handle hardware or network setups. I am basically a jack-of-all-trades when it comes to technology.
                 </motion.p>
               </div>
 
@@ -638,7 +638,7 @@ export default function App() {
                   className="px-6 py-3.5 bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-600 dark:to-pink-600 hover:opacity-90 text-white font-mono text-[11px] tracking-[0.2em] font-bold uppercase transition shadow-md flex items-center gap-2"
                   id="cta-contact"
                 >
-                  <span>RETAIN SERVICES</span>
+                  <span>MESSAGE ME</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </a>
 
@@ -695,7 +695,7 @@ export default function App() {
                 <div className="overflow-hidden aspect-square border border-neutral-100 dark:border-neutral-900 relative">
                   <img 
                     src={heroImage}
-                    alt="Joseph Umali, Lead UI Architect"
+                    alt="Joseph Umali"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover"
                   />
@@ -703,7 +703,7 @@ export default function App() {
                 </div>
 
                 <div className="pt-2 flex items-center justify-between font-mono text-[9px] text-neutral-400 dark:text-neutral-500 tracking-wider">
-                  <span>[REF_PORTRAIT_01]</span>
+                  <span>[MY_PHOTO]</span>
                   <span className="flex items-center gap-1">
                     <span className="w-1 h-1 bg-pink-500 rounded-full animate-ping" />
                   </span>
@@ -732,7 +732,7 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Creative Philosophy & Criteria
+              How I Work
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -760,7 +760,7 @@ export default function App() {
             className="space-y-1.5 pt-8 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              More than just development
+              Other Skills I Have
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -800,7 +800,7 @@ export default function App() {
           >
             <div className="space-y-1.5">
               <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-                Selected Work & Headless Solutions
+                Featured Projects
               </h3>
             </div>
             <motion.div 
@@ -840,7 +840,7 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Engineered Stack & Standards
+              My Tech Stack
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -905,7 +905,7 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Timeline of Shipped Value
+              My Experience
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -995,10 +995,10 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Initiate Dynamic Project Sprints
+              Get in Touch
             </h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-xl leading-relaxed pt-1 font-sans">
-              Outline specific deliverables, performance objectives, and legacy parameters below. I will analyze targets and initiate a follow-up briefing within the next cycle.
+              Feel free to send me a message if you need help with a website, a hardware fix, or a design layout. I will review it and get back to you as soon as I can.
             </p>
             <motion.div 
               initial={{ scaleX: 0 }}

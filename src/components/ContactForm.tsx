@@ -47,12 +47,12 @@ export default function ContactForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      setSubmitError("Please fill in all general message fields.");
+      setSubmitError("Please fill in all fields.");
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setSubmitError("Please provide a grammatically valid email address.");
+      setSubmitError("Please provide a valid email address.");
       return;
     }
 
@@ -120,14 +120,14 @@ export default function ContactForm() {
               {/* Name */}
               <div className="space-y-2">
                 <label className="text-[10px] font-mono tracking-[0.25em] text-neutral-400 dark:text-neutral-500 uppercase font-bold block">
-                  Sender Identity
+                  Your Name
                 </label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Elena Vance"
+                  placeholder="Juan dela Cruz"
                   className="w-full text-sm px-4 py-3 rounded-none bg-neutral-50 dark:bg-neutral-1050 border border-neutral-200 dark:border-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-900 dark:focus:border-pink-500 transition-all font-sans"
                   id="contact-name"
                   disabled={isSubmitting}
@@ -137,14 +137,14 @@ export default function ContactForm() {
               {/* Email Address */}
               <div className="space-y-2">
                 <label className="text-[10px] font-mono tracking-[0.25em] text-neutral-400 dark:text-neutral-500 uppercase font-bold block">
-                  Secure Return Gateway
+                  Your Email
                 </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="elena@nova.co"
+                  placeholder="juan@gmail.com"
                   className="w-full text-sm px-4 py-3 rounded-none bg-neutral-50 dark:bg-neutral-1050 border border-neutral-200 dark:border-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-900 dark:focus:border-pink-500 transition-all font-sans"
                   id="contact-email"
                   disabled={isSubmitting}
@@ -156,7 +156,7 @@ export default function ContactForm() {
               {/* Desired Service */}
               <div className="space-y-2">
                 <label className="text-[10px] font-mono tracking-[0.25em] text-neutral-400 dark:text-neutral-500 uppercase font-bold block">
-                  Proposed Target Objective
+                  What do you need help with?
                 </label>
                 <select
                   name="service"
@@ -166,17 +166,17 @@ export default function ContactForm() {
                   id="contact-service"
                   disabled={isSubmitting}
                 >
-                  <option value="SaaS Dashboard">Corporate SaaS Dashboard</option>
-                  <option value="Interactive Web App">Interactive Web Architecture</option>
-                  <option value="Technical Redesign">Speed Optimization & Redesign</option>
-                  <option value="Full-Stack System">Custom API / Database System</option>
+                  <option value="SaaS Dashboard">SaaS Dashboard / Web App</option>
+                  <option value="Interactive Web App">Interactive Website</option>
+                  <option value="Technical Redesign">Redesign & Optimization</option>
+                  <option value="Full-Stack System">Hardware & Networking</option>
                 </select>
               </div>
 
               {/* Budget Range */}
               <div className="space-y-2">
                 <label className="text-[10px] font-mono tracking-[0.25em] text-neutral-400 dark:text-neutral-500 uppercase font-bold block">
-                  Estimated Venture Budget
+                  Estimated Budget
                 </label>
                 <select
                   name="budget"
@@ -197,14 +197,14 @@ export default function ContactForm() {
             {/* Message */}
             <div className="space-y-2">
               <label className="text-[10px] font-mono tracking-[0.25em] text-neutral-400 dark:text-neutral-500 uppercase font-bold block">
-                Technical Blueprint Specs
+                Project Details
               </label>
               <textarea
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
                 rows={5}
-                placeholder="Briefly describe project goals, legacy integration params, performance KPIs, or preferred dev sprints..."
+                placeholder="Describe what you need help with (e.g., building a website, fixing a PC, drafting a CAD floor plan)..."
                 className="w-full text-sm px-4 py-3 rounded-none bg-neutral-50 dark:bg-neutral-1050 border border-neutral-200 dark:border-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-900 dark:focus:border-pink-500 transition-all font-sans resize-none"
                 id="contact-message"
                 disabled={isSubmitting}
@@ -221,12 +221,12 @@ export default function ContactForm() {
               {isSubmitting ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
-                  <span>Transmitting Payload...</span>
+                  <span>Sending...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-3.5 h-3.5" />
-                  <span>Transmit Venture Brief</span>
+                  <span>Send Message</span>
                 </>
               )}
             </button>
@@ -243,11 +243,11 @@ export default function ContactForm() {
             </div>
             
             <h4 className="text-xl font-serif italic text-neutral-950 dark:text-white">
-              Venture brief transmitted safely.
+              Message sent successfully!
             </h4>
             
             <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto leading-relaxed font-sans">
-              The specs have been stored locally in application state. Our scheduling algorithm will audit inputs and initiate outreach within the upcoming cycle.
+              Thank you! Your message has been saved in local state. I will review it and get back to you as soon as I can.
             </p>
 
             <button
@@ -255,7 +255,7 @@ export default function ContactForm() {
               className="px-6 py-2.5 bg-neutral-950 dark:bg-neutral-900 text-white rounded-none text-xs font-mono tracking-widest uppercase transition hover:opacity-90 pointer-events-auto cursor-pointer"
               id="send-another-proposal"
             >
-              Init New Transmit Call
+              Send Another Message
             </button>
           </motion.div>
         )}
@@ -271,9 +271,9 @@ export default function ContactForm() {
           >
             <span className="flex items-center gap-1.5 font-bold">
               <MessageSquareCode className="w-4 h-4 text-neutral-400 dark:text-pink-500" />
-              <span>Local Storage Inboxes ({submissions.length})</span>
+              <span>Saved Messages ({submissions.length})</span>
             </span>
-            <span className="text-[10px] bg-neutral-100 dark:bg-neutral-900 px-2 py-0.5">{showInboxes ? "Stow" : "Inspect"}</span>
+            <span className="text-[10px] bg-neutral-100 dark:bg-neutral-900 px-2 py-0.5">{showInboxes ? "Hide" : "Show"}</span>
           </button>
 
           <AnimatePresence>
@@ -291,11 +291,11 @@ export default function ContactForm() {
                     className="p-4 bg-neutral-50 dark:bg-neutral-1050 border border-neutral-200 dark:border-neutral-900 text-[11px] font-mono flex flex-col gap-1.5 text-neutral-600 dark:text-neutral-400"
                   >
                     <div className="flex justify-between text-neutral-400 items-center">
-                      <span>Sender: <strong className="text-neutral-800 dark:text-neutral-200">{sub.name}</strong> ({sub.email})</span>
+                      <span>From: <strong className="text-neutral-800 dark:text-neutral-200">{sub.name}</strong> ({sub.email})</span>
                       <span>{sub.createdAt}</span>
                     </div>
                     <div className="text-neutral-950 dark:text-pink-400 font-bold uppercase tracking-wider text-[9px]">
-                      {sub.service} // EST BUDGET {sub.budget}
+                      {sub.service} // Budget {sub.budget}
                     </div>
                     <p className="font-serif italic text-xs text-neutral-800 dark:text-neutral-300 bg-white dark:bg-neutral-950 p-3 border border-neutral-200 dark:border-neutral-900 mt-1">
                       "{sub.message}"
@@ -309,7 +309,7 @@ export default function ContactForm() {
                   id="clear-submissions-btn"
                 >
                   <Trash className="w-3.5 h-3.5" />
-                  <span>Flush Local Inboxes</span>
+                  <span>Clear Saved Messages</span>
                 </button>
               </motion.div>
             )}
