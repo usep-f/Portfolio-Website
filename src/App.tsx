@@ -889,39 +889,61 @@ export default function App() {
           <motion.div 
             variants={{
               hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.08 } }
+              visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.15 } }
             }}
-            className="border-l border-neutral-200 dark:border-neutral-900 ml-2 pl-6 space-y-10 relative"
+            className="relative space-y-8 md:space-y-12 pb-10 mt-8"
           >
-            {TIMELINE.map((step, idx) => (
-              <motion.div 
-                variants={{
-                  hidden: { opacity: 0, x: -15 },
-                  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-                }}
-                key={idx} 
-                className="relative space-y-1.5"
-              >
-                {/* Visual marker dot */}
-                <div className="absolute -left-[29px] top-2 w-2 h-2 bg-neutral-950 dark:bg-pink-400 rounded-none transition-transform" />
-                
-                <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 leading-none">
-                  {step.year} // CHRONO
-                </span>
+            {/* The Vertical Line: Left-aligned on mobile, Centered on md+ */}
+            <div className="absolute top-0 bottom-0 left-[15px] md:left-1/2 md:-translate-x-1/2 w-[2px] bg-gradient-to-b from-violet-500/50 via-pink-500/50 to-transparent" />
 
-                <h4 className="font-serif text-lg text-neutral-950 dark:text-white font-medium">
-                  {step.role}
-                </h4>
+            {TIMELINE.map((step, idx) => {
+              const isEven = idx % 2 === 0;
+              return (
+                <div key={idx} className={`relative flex flex-col md:flex-row items-start md:items-center w-full ${isEven ? 'md:flex-row-reverse' : ''}`}>
+                  
+                  {/* Visual Marker Dot */}
+                  <div className="absolute left-[15px] md:left-1/2 -translate-x-1/2 mt-[28px] md:mt-0 w-4 h-4 bg-white dark:bg-[#0c0c0c] border-2 border-pink-500 dark:border-pink-400 z-10 flex items-center justify-center rounded-none shadow-[0_0_10px_rgba(236,72,153,0.5)]">
+                    <div className="w-1.5 h-1.5 bg-neutral-950 dark:bg-white rounded-none" />
+                  </div>
 
-                <div className="text-[11px] font-mono text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 uppercase tracking-wider font-bold">
-                  {step.company}
+                  {/* Empty Spacer for alternating side on md+ */}
+                  <div className="hidden md:block md:w-1/2" />
+
+                  {/* Content Card Container */}
+                  <motion.div 
+                    variants={{
+                      hidden: { opacity: 0, x: isEven ? -40 : 40, y: 10 },
+                      visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+                    }}
+                    className={`w-full md:w-1/2 pl-12 md:pl-0 ${isEven ? 'md:pr-12 md:text-right' : 'md:pl-12 text-left'}`}
+                  >
+                    <div className="relative group bg-white/70 dark:bg-[#0c0c0c]/70 backdrop-blur-md border border-neutral-200 dark:border-neutral-900 p-6 md:p-8 hover:scale-[1.02] hover:border-pink-500/30 dark:hover:border-pink-400/30 transition-all duration-300 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgba(236,72,153,0.05)] rounded-none overflow-hidden">
+                      {/* Editorial Corners */}
+                      <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t-2 border-l-2 border-neutral-900 dark:border-pink-400 z-20 transition-colors" />
+                      <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-neutral-900 dark:border-pink-400 z-20 transition-colors" />
+
+                      <div className={`flex flex-col gap-2 relative z-10 ${isEven ? 'md:items-end' : 'items-start'}`}>
+                        <span className="inline-flex items-center justify-center text-[10px] font-mono text-neutral-400 dark:text-neutral-500 tracking-[0.1em] px-2 py-0.5 bg-neutral-100 dark:bg-neutral-950/50 border border-neutral-200 dark:border-neutral-800">
+                          {step.year} // CHRONO
+                        </span>
+
+                        <h4 className="font-serif text-xl text-neutral-950 dark:text-white font-normal mt-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                          {step.role}
+                        </h4>
+
+                        <div className="text-[11px] font-mono text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 uppercase tracking-widest font-bold">
+                          {step.company}
+                        </div>
+
+                        <p className={`text-xs text-neutral-500 dark:text-neutral-400 mt-2 leading-relaxed font-sans max-w-sm ${isEven ? 'md:text-right' : 'text-left'}`}>
+                          {step.description}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
-
-                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 max-w-2xl leading-relaxed font-sans">
-                  {step.description}
-                </p>
-              </motion.div>
-            ))}
+              );
+            })}
           </motion.div>
         </motion.section>
 

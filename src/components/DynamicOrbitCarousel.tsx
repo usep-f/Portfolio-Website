@@ -174,7 +174,7 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
               <motion.div
                 key={`tl-${hoveredSkill.name}`}
                 initial={{ opacity: 0, scale: 0.85, x: -30, y: -30 }}
-                animate={{ opacity: isDarkMode ? 0.08 : 0.12, scale: 1, x: 0, y: 0 }}
+                animate={{ opacity: isDarkMode ? 0.08 : 0.20, scale: 1, x: 0, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute -top-12 -left-54 w-[320px] h-[320px] flex items-center justify-center"
@@ -194,7 +194,7 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
               <motion.div
                 key={`br-${hoveredSkill.name}`}
                 initial={{ opacity: 0, scale: 0.85, x: 30, y: 30 }}
-                animate={{ opacity: isDarkMode ? 0.08 : 0.12, scale: 1, x: 0, y: 0 }}
+                animate={{ opacity: isDarkMode ? 0.08 : 0.20, scale: 1, x: 0, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
                 className="absolute -bottom-12 -right-57 w-[320px] h-[320px] flex items-center justify-center"
