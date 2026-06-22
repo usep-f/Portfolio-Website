@@ -86,6 +86,8 @@ import ProjectsSection from "./components/ProjectCard";
 import ContactForm from "./components/ContactForm";
 import BentoAbout from "./components/BentoAbout";
 import ResumeModal from "./components/ResumeModal";
+import DynamicOrbitCarousel from "./components/DynamicOrbitCarousel";
+import CustomCursor from "./components/CustomCursor";
 
 interface TypedHeroHeadingProps {
   triggerKey: number;
@@ -533,6 +535,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-transparent text-neutral-800 dark:text-neutral-200 transition-colors duration-500 selection:bg-pink-500/20 selection:text-neutral-900 dark:selection:text-white relative">
       
+      {/* Premium custom mouse pointer with trailing spring physics */}
+      <CustomCursor />
+
       {/* Dynamic Purple Bubble Gradient Background */}
       <DynamicPurpleBubblesBackground isDarkMode={isDarkMode} />
       
@@ -623,7 +628,7 @@ export default function App() {
       </header>
 
       {/* CORE FRAME FOR SCROLL CONTENT */}
-      <main className="max-w-4xl mx-auto px-6 md:px-12 py-16 md:py-24 space-y-28 relative z-10 bg-[#fcfcfc] dark:bg-[#080808] border-x border-neutral-200/30 dark:border-neutral-900/40 shadow-2xl shadow-neutral-950/5 min-h-screen">
+      <main className="max-w-4xl mx-auto px-6 md:px-12 py-16 md:py-24 space-y-28 relative z-10 bg-[#fcfcfc]/75 dark:bg-[#080808]/75 backdrop-blur-xl md:backdrop-blur-2xl border-x border-neutral-200/40 dark:border-neutral-800/45 shadow-2xl shadow-neutral-950/10 min-h-screen">
 
         {/* HERO SECTION MODULE WITH RESPONSIVE SPLIT */}
         <motion.section 
@@ -903,53 +908,16 @@ export default function App() {
             ))}
           </motion.div>
 
-          {/* Stack Badge Grid */}
+          {/* 4-Layer Dynamic Orbit Carousel (Pushed down to sit closer to timeline and avoid top hugging) */}
           <motion.div 
             variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+              hidden: { opacity: 0, scale: 0.95 },
+              visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
             }}
-            layout
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+            className="mt-16 md:mt-24 -mb-10 md:-mb-16 overflow-visible"
             id="skills-badges-list"
           >
-            <AnimatePresence mode="popLayout">
-              {filteredSkills.map((sk) => {
-                const IconComponent = skillIconMap[sk.iconName];
-                const styles = categoryColorStyles[sk.category] || categoryColorStyles.frontend;
-                
-                return (
-                  <motion.div
-                    layout
-                    key={sk.name}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-4 bg-white dark:bg-neutral-1050 border border-neutral-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700 transition-all duration-300 flex items-center gap-3.5 h-24 group relative overflow-hidden"
-                  >
-                    {/* Shadow overlay/glow effect underneath the icon inside the card */}
-                    <div className={`p-2 rounded-xl flex items-center justify-center bg-gradient-to-br ${styles.gradient} text-white shrink-0 relative transition-transform duration-300 group-hover:scale-110 ${styles.shadow}`}>
-                      <div className="absolute inset-x-0.5 bottom-0 h-2/3 rounded-xl bg-inherit blur-[6px] opacity-65 -z-10 transition-opacity duration-300 group-hover:opacity-85" />
-                      {IconComponent ? (
-                        <IconComponent className="w-5 h-5 stroke-[2]" />
-                      ) : (
-                        <Code className="w-5 h-5 stroke-[2]" />
-                      )}
-                    </div>
-
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-serif italic text-[13px] text-neutral-950 dark:text-white font-medium truncate leading-tight group-hover:text-pink-500 dark:group-hover:text-pink-400 transition-colors duration-200">
-                        {sk.name}
-                      </span>
-                      <span className="text-[8px] font-mono uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 mt-1">
-                        {sk.category}
-                      </span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
+            <DynamicOrbitCarousel activeSkillCat={activeSkillCat} isDarkMode={isDarkMode} />
           </motion.div>
         </motion.section>
 
