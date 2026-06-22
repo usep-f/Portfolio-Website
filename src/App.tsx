@@ -100,10 +100,10 @@ function TypedHeroHeading({ triggerKey }: TypedHeroHeadingProps) {
   const [isTypingForward, setIsTypingForward] = useState(true);
   const [showCursor, setShowCursor] = useState(true);
 
-  const part1 = "Hello, I'm ";
+  const part1 = "Hello, I'm";
   const part2 = "Joseph Umali";
   const part3 = ".";
-  const totalLength = part1.length + part2.length + part3.length; // 24
+  const totalLength = part1.length + part2.length + part3.length; // 23
 
   // Reset or run on triggerKey change (like back-to-top button)
   useEffect(() => {
@@ -193,43 +193,46 @@ function TypedHeroHeading({ triggerKey }: TypedHeroHeadingProps) {
 
   const cursor = (
     <span 
-      className="inline-block w-[2.5px] md:w-[3.5px] h-[0.85em] bg-pink-500 dark:bg-pink-400 ml-0.5 align-middle animate-pulse" 
+      className="inline-block w-[3px] md:w-[6px] h-[0.85em] bg-pink-500 dark:bg-pink-400 ml-1 md:ml-2 align-middle animate-pulse" 
       style={{ animationDuration: "0.8s" }} 
     />
   );
 
   return (
-    <motion.h2 
+    <motion.div 
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
-      className="text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-tight text-neutral-950 dark:text-white leading-[1.08]"
+      className="flex flex-col gap-1 md:gap-3 select-none"
     >
-      {/* Part 1 */}
-      <span>{visiblePart1}</span>
-      {showCursorAtPart1 && cursor}
-      {invisiblePart1 && (
-        <span className="opacity-0 select-none pointer-events-none">{invisiblePart1}</span>
-      )}
+      {/* Top Line: Hello, I'm */}
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans font-medium tracking-tight text-neutral-400 dark:text-neutral-500 leading-none whitespace-nowrap">
+        <span>{visiblePart1}</span>
+        {showCursorAtPart1 && cursor}
+        {invisiblePart1 && (
+          <span className="opacity-0 select-none pointer-events-none">{invisiblePart1}</span>
+        )}
+      </h2>
 
-      {/* Part 2 */}
-      <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 font-bold font-serif italic">
-        {visiblePart2}
-      </span>
-      {showCursorAtPart2 && cursor}
-      {invisiblePart2 && (
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 font-bold font-serif italic opacity-0 select-none pointer-events-none">
-          {invisiblePart2}
+      {/* Bottom Line: Joseph Umali */}
+      <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-serif italic font-black leading-[1.05] tracking-tight pb-1 whitespace-nowrap">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 dark:from-violet-400 dark:via-fuchsia-400 dark:to-pink-400">
+          {visiblePart2}
         </span>
-      )}
+        {showCursorAtPart2 && cursor}
+        {invisiblePart2 && (
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 dark:from-violet-400 dark:via-fuchsia-400 dark:to-pink-400 opacity-0 select-none pointer-events-none">
+            {invisiblePart2}
+          </span>
+        )}
 
-      {/* Part 3 */}
-      <span>{visiblePart3}</span>
-      {showCursorAtPart3 && cursor}
-      {invisiblePart3 && (
-        <span className="opacity-0 select-none pointer-events-none">{invisiblePart3}</span>
-      )}
-    </motion.h2>
+        <span>{visiblePart3}</span>
+        {showCursorAtPart3 && cursor}
+        {invisiblePart3 && (
+          <span className="opacity-0 select-none pointer-events-none">{invisiblePart3}</span>
+        )}
+      </h1>
+    </motion.div>
   );
 }
 
@@ -626,8 +629,8 @@ export default function App() {
         </div>
       </header>
 
-      {/* CORE FRAME FOR SCROLL CONTENT */}
-      <main className="max-w-4xl mx-auto px-6 md:px-12 py-16 md:py-24 space-y-28 relative z-10 bg-[#fcfcfc]/75 dark:bg-[#080808]/75 backdrop-blur-xl md:backdrop-blur-2xl border-x border-neutral-200/40 dark:border-neutral-800/45 shadow-2xl shadow-neutral-950/10 min-h-screen">
+      {/* CORE FRAME FOR SCROLL CONTENT - Increased width by exactly 50% max-w-4xl (896px) -> max-w-[1344px] */}
+      <main className="max-w-full md:max-w-[1344px] mx-auto px-6 md:px-12 py-16 md:py-24 space-y-28 relative z-10 bg-[#fcfcfc]/75 dark:bg-[#080808]/75 backdrop-blur-xl md:backdrop-blur-2xl border-x border-neutral-200/40 dark:border-neutral-800/45 shadow-2xl shadow-neutral-950/10 min-h-screen">
 
         {/* Scattered Background Geometric Blobs */}
         <CenterColumnGeometricBlobs />
