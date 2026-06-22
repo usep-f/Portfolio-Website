@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from "motion/react";
 import {
   Sun,
   Moon,
@@ -87,67 +87,377 @@ import ContactForm from "./components/ContactForm";
 import BentoAbout from "./components/BentoAbout";
 import ResumeModal from "./components/ResumeModal";
 
+interface TypedHeroHeadingProps {
+  triggerKey: number;
+}
+
+function TypedHeroHeading({ triggerKey }: TypedHeroHeadingProps) {
+  const [typedLength, setTypedLength] = useState(0);
+  const [isTypingForward, setIsTypingForward] = useState(true);
+  const [showCursor, setShowCursor] = useState(true);
+
+  const part1 = "Hello, I'm ";
+  const part2 = "Joseph Umali";
+  const part3 = ".";
+  const totalLength = part1.length + part2.length + part3.length; // 24
+
+  // Reset or run on triggerKey change (like back-to-top button)
+  useEffect(() => {
+    setTypedLength(0);
+    setIsTypingForward(true);
+    setShowCursor(true);
+  }, [triggerKey]);
+
+  // Monitor scroll to handle backspacing and preloaded forward typing
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      
+      // If user scrolls down past 120px, initiate a backspace sequence
+      if (currentScroll > 120) {
+        setIsTypingForward(false);
+      } 
+      // If user scrolls up and is close (within 300px), start typing forward
+      // This is the active "lazy / auto preload" mechanism that types ahead 
+      // before they can see an empty state!
+      else if (currentScroll <= 300) {
+        setIsTypingForward(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Check initial scroll on mount
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Run the typing interval
+  useEffect(() => {
+    let interval: any;
+    let cursorTimer: any;
+
+    if (isTypingForward) {
+      setShowCursor(true);
+      interval = setInterval(() => {
+        setTypedLength((prev) => {
+          if (prev >= totalLength) {
+            clearInterval(interval);
+            cursorTimer = setTimeout(() => {
+              setShowCursor(false);
+            }, 2500);
+            return totalLength;
+          }
+          return prev + 1;
+        });
+      }, 45); // elegant forward typing rate
+    } else {
+      setShowCursor(true);
+      interval = setInterval(() => {
+        setTypedLength((prev) => {
+          if (prev <= 0) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 15); // rapid professional backspacing rate
+    }
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(cursorTimer);
+    };
+  }, [isTypingForward, totalLength]);
+
+  // Compute boundaries for invisible overlay layout strategy
+  const v1 = Math.min(typedLength, part1.length);
+  const visiblePart1 = part1.substring(0, v1);
+  const invisiblePart1 = part1.substring(v1);
+
+  const v2 = typedLength > part1.length ? Math.min(typedLength - part1.length, part2.length) : 0;
+  const visiblePart2 = part2.substring(0, v2);
+  const invisiblePart2 = part2.substring(v2);
+
+  const v3 = typedLength > part1.length + part2.length ? Math.min(typedLength - (part1.length + part2.length), part3.length) : 0;
+  const visiblePart3 = part3.substring(0, v3);
+  const invisiblePart3 = part3.substring(v3);
+
+  const showCursorAtPart1 = showCursor && typedLength <= part1.length;
+  const showCursorAtPart2 = showCursor && typedLength > part1.length && typedLength <= (part1.length + part2.length);
+  const showCursorAtPart3 = showCursor && typedLength > (part1.length + part2.length);
+
+  const cursor = (
+    <span 
+      className="inline-block w-[2.5px] md:w-[3.5px] h-[0.85em] bg-pink-500 dark:bg-pink-400 ml-0.5 align-middle animate-pulse" 
+      style={{ animationDuration: "0.8s" }} 
+    />
+  );
+
+  return (
+    <motion.h2 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
+      className="text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-tight text-neutral-950 dark:text-white leading-[1.08]"
+    >
+      {/* Part 1 */}
+      <span>{visiblePart1}</span>
+      {showCursorAtPart1 && cursor}
+      {invisiblePart1 && (
+        <span className="opacity-0 select-none pointer-events-none">{invisiblePart1}</span>
+      )}
+
+      {/* Part 2 */}
+      <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 font-bold font-serif italic">
+        {visiblePart2}
+      </span>
+      {showCursorAtPart2 && cursor}
+      {invisiblePart2 && (
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 font-bold font-serif italic opacity-0 select-none pointer-events-none">
+          {invisiblePart2}
+        </span>
+      )}
+
+      {/* Part 3 */}
+      <span>{visiblePart3}</span>
+      {showCursorAtPart3 && cursor}
+      {invisiblePart3 && (
+        <span className="opacity-0 select-none pointer-events-none">{invisiblePart3}</span>
+      )}
+    </motion.h2>
+  );
+}
+
+interface BubbleProps {
+  isDarkMode: boolean;
+}
+
+function DynamicPurpleBubblesBackground({ isDarkMode }: BubbleProps) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  // Custom springs for fluid mouse movement tracking
+  const springConfig = { damping: 35, stiffness: 60, mass: 0.8 };
+  const mouseXSpring = useSpring(mouseX, springConfig);
+  const mouseYSpring = useSpring(mouseY, springConfig);
+
+  const [windowSize, setWindowSize] = useState({ width: 1200, height: 800 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+      if (!isHovered) setIsHovered(true);
+    };
+
+    const handleMouseLeave = () => {
+      setIsHovered(false);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseleave", handleMouseLeave);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [mouseX, mouseY, isHovered]);
+
+  const centerX = windowSize.width / 2;
+  const centerY = windowSize.height / 2;
+
+  // Parallax drift translations relative to screen size (different scale multipliers for 3D depth)
+  const driftX1 = useTransform(mouseXSpring, (v) => (v - centerX) * 0.05);
+  const driftY1 = useTransform(mouseYSpring, (v) => (v - centerY) * -0.05);
+
+  const driftX2 = useTransform(mouseXSpring, (v) => (v - centerX) * -0.07);
+  const driftY2 = useTransform(mouseYSpring, (v) => (v - centerY) * 0.07);
+
+  const driftX3 = useTransform(mouseXSpring, (v) => (v - centerX) * 0.08);
+  const driftY3 = useTransform(mouseYSpring, (v) => (v - centerY) * -0.08);
+
+  const driftX4 = useTransform(mouseXSpring, (v) => (v - centerX) * -0.05);
+  const driftY4 = useTransform(mouseYSpring, (v) => (v - centerY) * 0.05);
+
+  const driftX5 = useTransform(mouseXSpring, (v) => (v - centerX) * 0.07);
+  const driftY5 = useTransform(mouseYSpring, (v) => (v - centerY) * -0.07);
+
+  const bubbles = [
+    {
+      id: 1,
+      size: "w-[300px] h-[300px] md:w-[600px] md:h-[600px]",
+      lightGradient: "radial-gradient(circle, rgba(139, 92, 246, 0.55) 0%, rgba(139, 92, 246, 0) 70%)",
+      darkGradient: "radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(139, 92, 246, 0) 70%)",
+      animateX: [0, 40, -30, 0],
+      animateY: [0, -60, 30, 0],
+      duration: 25,
+      left: "-5%",
+      top: "5%",
+      driftX: driftX1,
+      driftY: driftY1,
+    },
+    {
+      id: 2,
+      size: "w-[250px] h-[250px] md:w-[500px] md:h-[500px]",
+      lightGradient: "radial-gradient(circle, rgba(236, 72, 153, 0.50) 0%, rgba(236, 72, 153, 0) 70%)",
+      darkGradient: "radial-gradient(circle, rgba(236, 72, 153, 0.22) 0%, rgba(236, 72, 153, 0) 70%)",
+      animateX: [0, -50, 40, 0],
+      animateY: [0, 50, -40, 0],
+      duration: 22,
+      right: "-5%",
+      top: "25%",
+      driftX: driftX2,
+      driftY: driftY2,
+    },
+    {
+      id: 3,
+      size: "w-[220px] h-[220px] md:w-[450px] md:h-[450px]",
+      lightGradient: "radial-gradient(circle, rgba(99, 102, 241, 0.52) 0%, rgba(99, 102, 241, 0) 70%)",
+      darkGradient: "radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(99, 102, 241, 0) 70%)",
+      animateX: [0, 30, -50, 0],
+      animateY: [0, 70, -30, 0],
+      duration: 28,
+      left: "15%",
+      bottom: "10%",
+      driftX: driftX3,
+      driftY: driftY3,
+    },
+    {
+      id: 4,
+      size: "w-[180px] h-[180px] md:w-[400px] md:h-[400px]",
+      lightGradient: "radial-gradient(circle, rgba(168, 85, 247, 0.52) 0%, rgba(168, 85, 247, 0) 70%)",
+      darkGradient: "radial-gradient(circle, rgba(168, 85, 247, 0.23) 0%, rgba(168, 85, 247, 0) 70%)",
+      animateX: [0, -35, 45, 0],
+      animateY: [0, -45, 35, 0],
+      duration: 20,
+      right: "10%",
+      bottom: "35%",
+      driftX: driftX4,
+      driftY: driftY4,
+    },
+    {
+      id: 5,
+      size: "w-[300px] h-[300px] md:w-[550px] md:h-[550px]",
+      lightGradient: "radial-gradient(circle, rgba(111, 44, 246, 0.45) 0%, rgba(111, 44, 246, 0) 70%)",
+      darkGradient: "radial-gradient(circle, rgba(139, 92, 246, 0.20) 0%, rgba(139, 92, 246, 0) 70%)",
+      animateX: [0, 45, -25, 0],
+      animateY: [0, -65, 45, 0],
+      duration: 30,
+      left: "35%",
+      top: "-5%",
+      driftX: driftX5,
+      driftY: driftY5,
+    }
+  ];
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      {/* Morphing Base Background */}
+      <div 
+        className={`absolute inset-0 transition-colors duration-1000 ease-in-out ${
+          isDarkMode 
+            ? "bg-[#080808]" 
+            : "bg-[#f2f1fa]"
+        }`} 
+      />
+      
+      {/* Soft Blurred Bubbles */}
+      <div className="absolute inset-0 blur-[75px] md:blur-[115px] opacity-100">
+        {bubbles.map((b) => (
+          <motion.div
+            key={b.id}
+            className="absolute rounded-full"
+            style={{
+              width: "100%",
+              height: "100%",
+              maxWidth: b.size.split(" ")[0].replace("w-[", "").replace("]", ""),
+              maxHeight: b.size.split(" ")[1].replace("h-[", "").replace("]", ""),
+              left: b.left,
+              top: b.top,
+              right: b.right,
+              bottom: b.bottom,
+            }}
+            animate={{
+              x: b.animateX,
+              y: b.animateY,
+              scale: [1, 1.06, 0.94, 1],
+            }}
+            transition={{
+              duration: b.duration,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            {/* Nested drift offset component to independently apply physics-based scroll/mouse interaction */}
+            <motion.div
+              className="w-full h-full rounded-full"
+              style={{
+                background: isDarkMode ? b.darkGradient : b.lightGradient,
+                x: b.driftX,
+                y: b.driftY,
+              }}
+            />
+          </motion.div>
+        ))}
+
+        {/* Dynamic Focus Tracker Bubble (strictly follows the mouse cursor) */}
+        <motion.div
+          className="absolute rounded-full hidden md:block"
+          animate={{
+            opacity: isHovered ? 1 : 0,
+            scale: isHovered ? 1 : 0.8,
+          }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            width: "600px",
+            height: "600px",
+            x: mouseXSpring,
+            y: mouseYSpring,
+            translateX: "-50%",
+            translateY: "-50%",
+            background: isDarkMode 
+              ? "radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, rgba(139, 92, 246, 0.08) 50%, rgba(0,0,0,0) 75%)"
+              : "radial-gradient(circle, rgba(139, 92, 246, 0.48) 0%, rgba(139, 92, 246, 0.16) 50%, rgba(0,0,0,0) 75%)",
+          }}
+        />
+      </div>
+      
+      {/* Crisp Grid pattern */}
+      <div 
+        className="absolute inset-0 transition-opacity duration-1000 pointer-events-none"
+        style={{
+          backgroundImage: isDarkMode 
+            ? "radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.15) 1.5px, transparent 0)"
+            : "radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.28) 1.8px, transparent 0)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+    </div>
+  );
+}
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [activeSkillCat, setActiveSkillCat] = useState<"all" | "frontend" | "backend" | "tools" | "creative">("all");
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  const [typingKey, setTypingKey] = useState(0);
+  const [isHeroOutOfView, setIsHeroOutOfView] = useState(false);
 
-  // Dynamic profile photo state with local storage persistence and highly matching Unsplash placeholder of a smiling young Asian male professional
-  const [heroImage, setHeroImage] = useState<string>(() => {
-    try {
-      const persisted = localStorage.getItem("user_hero_portrait_v1");
-      if (persisted) return persisted;
-    } catch (e) {
-      console.warn("localStorage read failed in sandbox context:", e);
-    }
-    return "https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?q=80&w=600&auto=format&fit=crop";
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  const handleImageFile = (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      alert("Please select or drop a valid image file.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result;
-      if (typeof result === "string") {
-        setHeroImage(result);
-        try {
-          localStorage.setItem("user_hero_portrait_v1", result);
-        } catch (err) {
-          console.warn("localStorage write failed:", err);
-        }
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      handleImageFile(file);
-    }
-  };
-
-  const handleClickUpload = () => {
-    fileInputRef.current?.click();
-  };
+  // Permanent profile photo link featuring a smiling headshot of a professional
+  const heroImage = "https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?q=80&w=600&auto=format&fit=crop";
 
   // Track scroll progress
   useEffect(() => {
@@ -165,6 +475,21 @@ export default function App() {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Monitor scroll to replay the typing animation if we scroll far away and then scrollback to the top
+  useEffect(() => {
+    const handleScrollReplay = () => {
+      const currentScroll = window.scrollY;
+      if (currentScroll > 500) {
+        setIsHeroOutOfView(true);
+      } else if (currentScroll < 10 && isHeroOutOfView) {
+        setTypingKey((prev) => prev + 1);
+        setIsHeroOutOfView(false);
+      }
+    };
+    window.addEventListener("scroll", handleScrollReplay, { passive: true });
+    return () => window.removeEventListener("scroll", handleScrollReplay);
+  }, [isHeroOutOfView]);
 
   // Load and apply theme
   useEffect(() => {
@@ -206,7 +531,10 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] dark:bg-[#080808] text-neutral-800 dark:text-neutral-200 transition-colors duration-500 selection:bg-pink-500/20 selection:text-neutral-900 dark:selection:text-white relative">
+    <div className="min-h-screen bg-transparent text-neutral-800 dark:text-neutral-200 transition-colors duration-500 selection:bg-pink-500/20 selection:text-neutral-900 dark:selection:text-white relative">
+      
+      {/* Dynamic Purple Bubble Gradient Background */}
+      <DynamicPurpleBubblesBackground isDarkMode={isDarkMode} />
       
       {/* Fixed Scroll Progress Indicator Bar */}
       <div 
@@ -219,7 +547,7 @@ export default function App() {
       <div className="absolute inset-x-0 top-0 h-[10px] bg-neutral-900 dark:bg-gradient-to-r dark:from-violet-500 dark:to-pink-500 z-50" />
 
       {/* FIXED NAV BAR */}
-      <header className="sticky top-0 z-40 w-full bg-[#fcfcfc]/90 dark:bg-[#080808]/90 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-900">
+      <header className="sticky top-0 z-40 w-full bg-[#fcfcfc]/60 dark:bg-[#080808]/60 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-900/50">
         <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
           <motion.div 
             initial={{ opacity: 0, x: -10 }}
@@ -295,37 +623,41 @@ export default function App() {
       </header>
 
       {/* CORE FRAME FOR SCROLL CONTENT */}
-      <main className="max-w-4xl mx-auto px-6 py-16 md:py-24 space-y-28 relative z-10">
+      <main className="max-w-4xl mx-auto px-6 md:px-12 py-16 md:py-24 space-y-28 relative z-10 bg-[#fcfcfc] dark:bg-[#080808] border-x border-neutral-200/30 dark:border-neutral-900/40 shadow-2xl shadow-neutral-950/5 min-h-screen">
 
         {/* HERO SECTION MODULE WITH RESPONSIVE SPLIT */}
-        <section className="pt-4">
+        <motion.section 
+          className="pt-4"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, margin: "-10%" }}
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
+          }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
             {/* Left Content Column */}
             <div className="md:col-span-8 space-y-8">
               <div className="space-y-5">
                 <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+                  }}
                   className="inline-flex items-center gap-2 border-b border-neutral-400 dark:border-pink-500 pb-1 text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-400 dark:text-pink-400 font-bold"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Independent UI Architecture</span>
                 </motion.div>
 
-                <motion.h2 
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-serif font-normal tracking-tight text-neutral-950 dark:text-white leading-[1.08]"
-                >
-                  Hello, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 font-bold font-serif italic">Joseph Umali</span>.
-                </motion.h2>
+                <TypedHeroHeading triggerKey={typingKey} />
 
                 <motion.p 
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
+                  variants={{
+                    hidden: { opacity: 0, y: 15 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+                  }}
                   className="text-sm md:text-base text-neutral-500 dark:text-neutral-400 max-w-2xl leading-relaxed font-sans"
                 >
                   I shape interfaces that elevate digital interaction. I build rapid code structures on Vite, compile responsive headless client frameworks, and engineer custom dashboard systems with pristine typographic balance and responsive fidelity.
@@ -334,9 +666,10 @@ export default function App() {
 
               {/* Socials & Interactive CTAs */}
               <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+                }}
                 className="flex flex-wrap items-center gap-4 pt-2"
               >
                 <a
@@ -385,34 +718,15 @@ export default function App() {
 
             {/* Right Picture Column */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              variants={{
+                hidden: { opacity: 0, scale: 0.95 },
+                visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+              }}
               className="md:col-span-4 flex flex-col items-center md:items-end"
             >
               <div 
-                className={`w-full max-w-[280px] p-2 bg-white dark:bg-[#0c0c0c] border relative group transition-all duration-300 cursor-pointer ${
-                  isDragging 
-                    ? "border-pink-500 scale-[1.02] shadow-[0_0_15px_rgba(236,72,153,0.2)]" 
-                    : "border-neutral-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700"
-                }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={handleClickUpload}
-                title="Click or drag any image file here to set your custom photo live!"
+                className="w-full max-w-[280px] p-2 bg-white dark:bg-[#0c0c0c] border border-neutral-200 dark:border-neutral-900 relative group transition-all duration-300"
               >
-                <input 
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageFile(file);
-                  }}
-                />
-                
                 {/* Accent corner line overlays */}
                 <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t-2 border-l-2 border-neutral-900 dark:border-pink-400 z-20" />
                 <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-neutral-900 dark:border-pink-400 z-20" />
@@ -422,18 +736,9 @@ export default function App() {
                     src={heroImage}
                     alt="Joseph Umali, Lead UI Architect"
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover grayscale contrast-115 brightness-95 md:group-hover:grayscale-0 md:group-hover:scale-105 transition-all duration-700 ease-out"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-neutral-900/10 mix-blend-overlay pointer-events-none" />
-                  
-                  {/* Hover interactive overlay */}
-                  <div className="absolute inset-0 bg-neutral-950/70 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-center p-4 transition-all duration-300 z-10 backdrop-blur-[2px]">
-                    <Sparkles className="w-5 h-5 text-pink-400 animate-pulse mb-1" />
-                    <span className="text-[10px] uppercase tracking-widest font-mono text-pink-400 font-semibold mb-1">Update Photo</span>
-                    <p className="text-[9px] text-neutral-300 max-w-[140px] leading-relaxed">
-                      Click or drag & drop your headshot image here
-                    </p>
-                  </div>
                 </div>
 
                 <div className="pt-2 flex items-center justify-between font-mono text-[9px] text-neutral-400 dark:text-neutral-500 tracking-wider">
@@ -443,23 +748,9 @@ export default function App() {
                   </span>
                 </div>
               </div>
-
-              {/* Reset to Default Button */}
-              {heroImage !== "https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?q=80&w=600&auto=format&fit=crop" && (
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    localStorage.removeItem("user_hero_portrait_v1");
-                    setHeroImage("https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?q=80&w=600&auto=format&fit=crop");
-                  }}
-                  className="mt-2 text-[10px] font-mono text-neutral-400 hover:text-red-500 transition-colors uppercase tracking-widest flex items-center gap-1"
-                >
-                  ✕ Reset image
-                </button>
-              )}
             </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         {/* DETAILS GRID / BENTO PROFILE */}
         <motion.section
@@ -467,10 +758,10 @@ export default function App() {
           className="space-y-6 pt-4"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-10%" }}
+          viewport={{ once: false, margin: "-10%" }}
           variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.12 } }
+            hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
           }}
         >
           <motion.div 
@@ -489,7 +780,7 @@ export default function App() {
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -511,10 +802,10 @@ export default function App() {
           className="space-y-6 pt-4"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-10%" }}
+          viewport={{ once: false, margin: "-10%" }}
           variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.12 } }
+            hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
           }}
         >
           <motion.div 
@@ -538,7 +829,7 @@ export default function App() {
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -560,10 +851,10 @@ export default function App() {
           className="space-y-6 pt-4"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-10%" }}
+          viewport={{ once: false, margin: "-10%" }}
           variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.12 } }
+            hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
           }}
         >
           <motion.div 
@@ -582,7 +873,7 @@ export default function App() {
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -667,10 +958,10 @@ export default function App() {
           className="space-y-6 pt-4"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-10%" }}
+          viewport={{ once: false, margin: "-10%" }}
           variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.12 } }
+            hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
           }}
         >
           <motion.div 
@@ -689,7 +980,7 @@ export default function App() {
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -740,10 +1031,10 @@ export default function App() {
           className="space-y-6 pt-4"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-10%" }}
+          viewport={{ once: false, margin: "-10%" }}
           variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.12 } }
+            hidden: { opacity: 0, y: 30, transition: { duration: 0.4 } },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.12 } }
           }}
         >
           <motion.div 
@@ -765,7 +1056,7 @@ export default function App() {
             <motion.div 
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false }}
               transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="absolute bottom-0 left-0 right-0 h-[1px] bg-neutral-200 dark:bg-neutral-900 origin-left"
             />
@@ -809,7 +1100,11 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 15 }}
             transition={{ type: "spring", stiffness: 350, damping: 28 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              setTypingKey((prev) => prev + 1);
+              setIsHeroOutOfView(false);
+            }}
             className="fixed bottom-6 right-6 z-[100] px-4 py-3 bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-500 dark:to-pink-500 text-white dark:text-white border border-neutral-800 dark:border-pink-400 text-[10px] font-mono tracking-[0.2em] uppercase transition flex items-center gap-2 hover:bg-neutral-900 dark:hover:opacity-90 group cursor-pointer font-bold shadow-lg shadow-neutral-950/5 dark:shadow-pink-500/5 rounded-none"
             id="back-to-top-btn"
             title="Back to Top"

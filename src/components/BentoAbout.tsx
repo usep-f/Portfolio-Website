@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, Laptop2, Terminal, Smartphone, Globe } from "lucide-react";
+import { MapPin, Laptop2, Terminal, Smartphone, Globe, Cpu } from "lucide-react";
 
 export default function BentoAbout() {
   return (
@@ -13,13 +13,6 @@ export default function BentoAbout() {
           </div>
 
           <div className="space-y-6 relative z-10">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-neutral-900 dark:bg-pink-400" />
-              <span className="text-[10px] font-mono tracking-[0.2em] font-bold text-neutral-400 dark:text-neutral-500 uppercase">
-                Operational Narrative
-              </span>
-            </div>
-
             <h3 className="text-2xl md:text-3xl font-serif italic font-normal tracking-tight text-neutral-950 dark:text-neutral-100 leading-tight">
               Building complex digital systems at the intersection of <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 italic font-bold">aesthetics</span> and <span className="text-neutral-900 dark:text-white font-semibold">logic</span>.
             </h3>
@@ -43,36 +36,20 @@ export default function BentoAbout() {
         </div>
 
         {/* Philosophy / Ping card (Span 1) */}
-        <div className="p-8 bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-900 flex flex-col justify-between group">
-          <div className="space-y-4">
-            <div className="text-[10px] font-mono tracking-[0.15em] text-neutral-400 dark:text-neutral-500 uppercase font-bold">
-              01 / CRITERION
-            </div>
-
-            <div>
-              <h4 className="font-serif italic text-lg text-neutral-950 dark:text-white">
-                The Speed Directive
-              </h4>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-3 leading-relaxed font-sans">
-                Every interface is built on a tight custom framework ensuring light layouts and minimal runtime performance payload. Coded cleanly to keep your conversion metrics high.
-              </p>
-            </div>
+        <div className="p-8 bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-900 flex flex-col justify-center group relative overflow-hidden">
+          <div className="absolute -top-6 -right-6 p-2 opacity-[0.035] dark:opacity-[0.05] pointer-events-none group-hover:scale-105 transition-transform duration-500 ease-out">
+            <Cpu className="w-48 h-48 rotate-[24deg] text-neutral-950 dark:text-pink-500" />
           </div>
 
-          <div className="mt-8 p-3 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-900 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
-              </span>
-              <div className="text-[10px] font-mono leading-none">
-                <div className="text-neutral-900 dark:text-neutral-300 font-bold uppercase tracking-wider">Status: Available</div>
-                <div className="text-neutral-400 dark:text-neutral-500 mt-1">Accepting Projects</div>
-              </div>
+          <div className="space-y-4 relative z-10">
+            <div>
+              <h4 className="font-serif italic text-lg text-neutral-950 dark:text-white">
+                Architected AI Workflow
+              </h4>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-3 leading-relaxed font-sans">
+                I leverage an advanced AI-assisted workflow paired with strict design implementations and rigorous system architectures. This combination eliminates code hallucinations, guarantees pristine layout fidelity, and maximizes security throughout the entire development lifecycle.
+              </p>
             </div>
-            <span className="text-[10px] font-mono font-medium text-pink-600 dark:text-pink-400">
-              Q2 '26
-            </span>
           </div>
         </div>
       </div>
@@ -86,7 +63,7 @@ export default function BentoAbout() {
               src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop" 
               alt="Full Stack Web Development"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover grayscale opacity-90 group-hover:scale-[1.03] group-hover:grayscale-0 transition-all duration-500"
+              className="w-full h-full object-cover"
             />
             <div className="absolute top-4 left-4 bg-neutral-950/80 dark:bg-[#080808]/80 backdrop-blur-md text-white font-mono text-[9px] uppercase tracking-widest px-2.5 py-1.5 flex items-center gap-1.5 border border-white/15">
               <Globe className="w-3.5 h-3.5 text-pink-400" />
@@ -95,9 +72,6 @@ export default function BentoAbout() {
           </div>
           <div className="p-8 flex-1 flex flex-col justify-between">
             <div className="space-y-3">
-              <span className="text-[10px] font-mono tracking-[0.2em] font-bold text-neutral-400 dark:text-neutral-500 uppercase block">
-                02 / CORE DISCIPLINE
-              </span>
               <h4 className="text-2xl font-serif italic text-neutral-950 dark:text-white group-hover:text-pink-500 transition-colors">
                 Full Stack Web Development
               </h4>
@@ -115,7 +89,7 @@ export default function BentoAbout() {
               src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800&auto=format&fit=crop" 
               alt="Mobile App Development"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover grayscale opacity-90 group-hover:scale-[1.03] group-hover:grayscale-0 transition-all duration-500"
+              className="w-full h-full object-cover"
             />
             <div className="absolute top-4 left-4 bg-neutral-950/80 dark:bg-[#080808]/80 backdrop-blur-md text-white font-mono text-[9px] uppercase tracking-widest px-2.5 py-1.5 flex items-center gap-1.5 border border-white/15">
               <Smartphone className="w-3.5 h-3.5 text-pink-400" />
@@ -124,9 +98,6 @@ export default function BentoAbout() {
           </div>
           <div className="p-8 flex-1 flex flex-col justify-between">
             <div className="space-y-3">
-              <span className="text-[10px] font-mono tracking-[0.2em] font-bold text-neutral-400 dark:text-neutral-500 uppercase block">
-                03 / CORE DISCIPLINE
-              </span>
               <h4 className="text-2xl font-serif italic text-neutral-950 dark:text-white group-hover:text-pink-500 transition-colors">
                 Mobile App Development
               </h4>
