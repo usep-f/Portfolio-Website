@@ -88,6 +88,8 @@ import BentoAbout from "./components/BentoAbout";
 import ResumeModal from "./components/ResumeModal";
 import DynamicOrbitCarousel from "./components/DynamicOrbitCarousel";
 import CustomCursor from "./components/CustomCursor";
+import HeroAbstractBackground from "./components/HeroAbstractBackground";
+import CenterColumnGeometricBlobs from "./components/CenterColumnGeometricBlobs";
 
 interface TypedHeroHeadingProps {
   triggerKey: number;
@@ -630,9 +632,12 @@ export default function App() {
       {/* CORE FRAME FOR SCROLL CONTENT */}
       <main className="max-w-4xl mx-auto px-6 md:px-12 py-16 md:py-24 space-y-28 relative z-10 bg-[#fcfcfc]/75 dark:bg-[#080808]/75 backdrop-blur-xl md:backdrop-blur-2xl border-x border-neutral-200/40 dark:border-neutral-800/45 shadow-2xl shadow-neutral-950/10 min-h-screen">
 
+        {/* Scattered Background Geometric Blobs */}
+        <CenterColumnGeometricBlobs />
+
         {/* HERO SECTION MODULE WITH RESPONSIVE SPLIT */}
         <motion.section 
-          className="pt-4"
+          className="pt-4 relative z-10 overflow-hidden p-6 md:p-10 rounded-2xl border border-neutral-200/40 dark:border-neutral-900/45 bg-[#fcfcfc]/40 dark:bg-[#080808]/40 shadow-sm"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, margin: "-10%" }}
@@ -641,7 +646,10 @@ export default function App() {
             visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
           }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
+          {/* Subtle Abstract Graphic Blueprint Patterns */}
+          <HeroAbstractBackground />
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center relative z-10">
             {/* Left Content Column */}
             <div className="md:col-span-8 space-y-8">
               <div className="space-y-5">
@@ -760,7 +768,7 @@ export default function App() {
         {/* DETAILS GRID / BENTO PROFILE */}
         <motion.section
           id="about-section"
-          className="space-y-6 pt-4"
+          className="space-y-6 pt-4 relative z-10"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, margin: "-10%" }}
@@ -804,7 +812,7 @@ export default function App() {
         {/* WORK PORTFOLIO GRID CASE CASES */}
         <motion.section
           id="projects-section"
-          className="space-y-6 pt-4"
+          className="space-y-6 pt-4 relative z-10"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, margin: "-10%" }}
@@ -853,7 +861,7 @@ export default function App() {
         {/* TECHNICAL SKILLS BADGES DRILL-DOWN */}
         <motion.section
           id="skills-section"
-          className="space-y-6 pt-4"
+          className="space-y-6 pt-4 relative z-10"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, margin: "-10%" }}
@@ -923,7 +931,7 @@ export default function App() {
 
         {/* WORK TIMELINE TRACKER */}
         <motion.section
-          className="space-y-6 pt-4"
+          className="space-y-6 pt-4 relative z-10"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, margin: "-10%" }}
@@ -996,7 +1004,7 @@ export default function App() {
         {/* CONTACT GATHERING FORM BOX */}
         <motion.section
           id="contact-section"
-          className="space-y-6 pt-4"
+          className="space-y-6 pt-4 relative z-10"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, margin: "-10%" }}
@@ -1042,7 +1050,7 @@ export default function App() {
         </motion.section>
 
         {/* FOOTER */}
-        <footer className="pt-10 border-t border-neutral-200 dark:border-neutral-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+        <footer className="pt-10 border-t border-neutral-200 dark:border-neutral-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider relative z-10">
           <div className="flex items-center gap-1">
             <span>© 2026 Joseph Umali // CODED COMPLIANT WITH</span>
             <Heart className="w-3 h-3 text-red-500 mx-0.5" />
