@@ -96,11 +96,11 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
   // Responsive radii based on screen size (highly balanced to clear the central hub completely)
   const radii = isMobile 
     ? { frontend: 140, backend: 118, tools: 96, creative: 74 }
-    : { frontend: 216, backend: 180, tools: 144, creative: 108 };
+    : { frontend: 300, backend: 250, tools: 200, creative: 150 };
 
   // Responsive widths / heights of individual elements
-  const badgeSize = isMobile ? "w-8.5 h-8.5" : "w-11 h-11";
-  const hubSize = isMobile ? "w-[68px] h-[68px]" : "w-[108px] h-[108px]";
+  const badgeSize = isMobile ? "w-8.5 h-8.5" : "w-[60px] h-[60px]";
+  const hubSize = isMobile ? "w-[68px] h-[68px]" : "w-[150px] h-[150px]";
 
   // Filter skills by layer
   const frontendSkills = SKILLS.filter(sk => sk.category === "frontend");
@@ -144,7 +144,7 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
   ];
 
   return (
-    <div className="relative w-full aspect-square max-w-[480px] mx-auto flex items-center justify-center select-none overflow-visible pt-2 pb-2">
+    <div className="relative w-full aspect-square max-w-[440px] md:max-w-[680px] mx-auto flex items-center justify-center select-none overflow-visible pt-2 pb-2">
       <style>{`
         @keyframes orbit-cw {
           from { transform: rotate(0deg); }
@@ -164,6 +164,55 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
           animation-play-state: paused !important;
         }
       `}</style>
+
+      {/* Dynamic Corner Hover Background Watermarks (Desktop Only) */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none z-0">
+        <AnimatePresence>
+          {hoveredSkill && (
+            <>
+              {/* Top Left Watermark */}
+              <motion.div
+                key={`tl-${hoveredSkill.name}`}
+                initial={{ opacity: 0, scale: 0.85, x: -30, y: -30 }}
+                animate={{ opacity: isDarkMode ? 0.08 : 0.12, scale: 1, x: 0, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute -top-12 -left-54 w-[320px] h-[320px] flex items-center justify-center"
+                style={{
+                  color: skillIconMap[hoveredSkill.iconName]?.color || "#6b7280",
+                  maskImage: "radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 75%)",
+                  WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 75%)"
+                }}
+              >
+                {(() => {
+                  const Icon = skillIconMap[hoveredSkill.iconName]?.Icon || Code;
+                  return <Icon className="w-full h-full" />;
+                })()}
+              </motion.div>
+
+              {/* Bottom Right Watermark */}
+              <motion.div
+                key={`br-${hoveredSkill.name}`}
+                initial={{ opacity: 0, scale: 0.85, x: 30, y: 30 }}
+                animate={{ opacity: isDarkMode ? 0.08 : 0.12, scale: 1, x: 0, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+                className="absolute -bottom-12 -right-57 w-[320px] h-[320px] flex items-center justify-center"
+                style={{
+                  color: skillIconMap[hoveredSkill.iconName]?.color || "#6b7280",
+                  maskImage: "radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 75%)",
+                  WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 75%)"
+                }}
+              >
+                {(() => {
+                  const Icon = skillIconMap[hoveredSkill.iconName]?.Icon || Code;
+                  return <Icon className="w-full h-full" />;
+                })()}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Grid cross lines underlay (subtle artistic detailing) */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -263,7 +312,7 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
                           <div className={`absolute inset-0.5 rounded-full bg-gradient-to-br ${catStyle.bgGlow} opacity-0 transition-opacity duration-300 group-hover:opacity-10 dark:group-hover:opacity-15 pointer-events-none`} />
                           
                           <Icon 
-                            className={`w-4.5 h-4.5 transition-colors duration-300 ${
+                            className={`w-4.5 h-4.5 md:w-6 md:h-6 transition-colors duration-300 ${
                               isThisHovered 
                                 ? "" 
                                 : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
@@ -297,8 +346,8 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
           <div
             className={`rounded-full flex flex-col items-center justify-center bg-white/80 dark:bg-[#07070d]/85 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-2xl transition-all duration-500 text-center relative overflow-hidden`}
             style={{
-              width: isMobile ? 104 : 144,
-              height: isMobile ? 104 : 144,
+              width: isMobile ? 104 : 200,
+              height: isMobile ? 104 : 200,
             }}
           >
             {/* Soft inner ambient blur glow center */}
@@ -313,11 +362,11 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="p-3 flex flex-col items-center justify-center space-y-1 z-10"
                 >
-                  <Cpu className="w-5 h-5 md:w-6 md:h-6 text-neutral-400 dark:text-neutral-500 animate-pulse stroke-[1.5]" />
-                  <span className="font-serif italic text-xs md:text-sm font-medium text-neutral-950 dark:text-white">
+                  <Cpu className="w-5 h-5 md:w-8 md:h-8 text-neutral-400 dark:text-neutral-500 animate-pulse stroke-[1.5]" />
+                  <span className="font-serif italic text-xs md:text-base font-medium text-neutral-950 dark:text-white">
                     Stack Space
                   </span>
-                  <span className="text-[7px] md:text-[8px] font-mono uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 max-w-[90px] md:max-w-[110px] leading-normal">
+                  <span className="text-[7px] md:text-[9.5px] font-mono uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 max-w-[90px] md:max-w-[140px] leading-normal">
                     {isMobile ? "Tap to decode" : "Hover to explore"}
                   </span>
                 </motion.div>
@@ -337,25 +386,25 @@ export default function DynamicOrbitCarousel({ activeSkillCat, isDarkMode }: Orb
                     
                     return (
                       <>
-                        <div className={`p-1.5 rounded-full bg-gradient-to-br ${catStyle?.bgGlow} text-white scale-90 md:scale-100 shadow-md`}>
+                        <div className={`p-1.5 rounded-full bg-gradient-to-br ${catStyle?.bgGlow} text-white scale-90 md:scale-125 shadow-md`}>
                           <HoveredIcon className="w-3.5 h-3.5" />
                         </div>
                         
                         <div className="flex flex-col items-center text-center w-full">
-                          <span className="font-serif italic text-[10px] md:text-[12px] font-semibold text-neutral-950 dark:text-white leading-tight line-clamp-1 max-w-[95px] md:max-w-[125px]">
+                          <span className="font-serif italic text-[10px] md:text-[14px] font-semibold text-neutral-950 dark:text-white leading-tight line-clamp-1 max-w-[95px] md:max-w-[160px]">
                             {hoveredSkill.name}
                           </span>
                           
-                          <span className="text-[6.5px] md:text-[7.5px] font-mono uppercase tracking-[0.2em] text-pink-500 dark:text-pink-400 font-bold mt-0.5">
+                          <span className="text-[6.5px] md:text-[8.5px] font-mono uppercase tracking-[0.2em] text-pink-500 dark:text-pink-400 font-bold mt-0.5">
                             {hoveredSkill.category}
                           </span>
-
-                          <span className="text-[8px] md:text-[9.5px] font-mono font-medium text-neutral-400 dark:text-neutral-500 mt-0.5">
+ 
+                          <span className="text-[8px] md:text-[10.5px] font-mono font-medium text-neutral-400 dark:text-neutral-500 mt-0.5">
                             {hoveredSkill.level}% Level
                           </span>
                           
                           {/* Mini dynamic colored tracking bar */}
-                          <div className="w-10 h-0.5 mt-1 bg-neutral-100 dark:bg-neutral-900 rounded-full overflow-hidden">
+                          <div className="w-10 md:w-16 h-0.5 md:h-1 mt-1 bg-neutral-100 dark:bg-neutral-900 rounded-full overflow-hidden">
                             <motion.div 
                               initial={{ width: 0 }}
                               animate={{ width: `${hoveredSkill.level}%` }}
