@@ -44,7 +44,7 @@ export default function ContactForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setSubmitError("Please fill in all fields.");
@@ -59,37 +59,71 @@ export default function ContactForm() {
     setSubmitError("");
     setIsSubmitting(true);
 
-    // Simulate server side relay delay
-    setTimeout(() => {
-      const newSubmission: ContactSubmission = {
-        id: Math.random().toString(36).substring(2, 9),
-        name: formData.name,
-        email: formData.email,
-        service: formData.service,
-        budget: formData.budget,
-        message: formData.message,
-        createdAt: new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) + ", Jun 21 2026"
-      };
-
-      try {
-        const nextSubmissions = [newSubmission, ...submissions];
-        localStorage.setItem("portfolio_submissions_v1", JSON.stringify(nextSubmissions));
-        setSubmissions(nextSubmissions);
-      } catch (err) {
-        console.warn("Storage sync skipped", err);
-      }
-
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+    if (!accessKey) {
+      setSubmitError("Web3Forms Access Key is missing. Please configure VITE_WEB3FORMS_ACCESS_KEY in your .env file.");
       setIsSubmitting(false);
-      setSubmitSuccess(true);
-      // Reset form variables
-      setFormData({
-        name: "",
-        email: "",
-        service: "SaaS Dashboard",
-        budget: "$2k - $5k",
-        message: ""
+      return;
+    }
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: formData.name,
+          email: formData.email,
+          subject: `New Portfolio Contact: ${formData.name}`,
+          from_name: "Portfolio Contact Form",
+          message: formData.message,
+          service: formData.service,
+          budget: formData.budget,
+        })
       });
-    }, 1200);
+
+      const result = await response.json();
+
+      if (result.success) {
+        const newSubmission: ContactSubmission = {
+          id: Math.random().toString(36).substring(2, 9),
+          name: formData.name,
+          email: formData.email,
+          service: formData.service,
+          budget: formData.budget,
+          message: formData.message,
+          createdAt: new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) + ", Jun 21 2026"
+        };
+
+        try {
+          const nextSubmissions = [newSubmission, ...submissions];
+          localStorage.setItem("portfolio_submissions_v1", JSON.stringify(nextSubmissions));
+          setSubmissions(nextSubmissions);
+        } catch (err) {
+          console.warn("Storage sync skipped", err);
+        }
+
+        setSubmitSuccess(true);
+        // Reset form variables
+        setFormData({
+          name: "",
+          email: "",
+          service: "SaaS Dashboard",
+          budget: "$2k - $5k",
+          message: ""
+        });
+      } else {
+        setSubmitError(result.message || "Failed to submit form.");
+      }
+    } catch (err) {
+      console.error("Web3Forms submission error", err);
+      setSubmitError("Failed to connect to the email service. Please check your internet connection.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
