@@ -23,6 +23,7 @@ import CustomCursor from "./components/CustomCursor";
 import HeroAbstractBackground from "./components/HeroAbstractBackground";
 import CenterColumnGeometricBlobs from "./components/CenterColumnGeometricBlobs";
 import logo from "@/assets/logo.png";
+import heroImage from "@/assets/Adobe Express - file.png";
 
 interface TypedHeroHeadingProps {
   triggerKey: number;
@@ -424,7 +425,6 @@ export default function App() {
   });
 
   // Permanent profile photo link featuring a smiling headshot of a professional
-  const heroImage = "assets/Adobe Express - file.png";
 
   // Track scroll position for back to top button visibility
   useEffect(() => {
