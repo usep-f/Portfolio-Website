@@ -3,6 +3,16 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowUpRight, Github, CheckCircle2, ChevronRight, X, ExternalLink, Code } from "lucide-react";
 import { Project } from "../types";
 
+function sanitizeUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower.startsWith("http://") || lower.startsWith("https://")) {
+    return trimmed;
+  }
+  return undefined;
+}
+
 interface ProjectsSectionProps {
   projects?: Project[];
 }
@@ -232,9 +242,9 @@ export default function ProjectsSection({ projects = [] }: ProjectsSectionProps)
               {/* Footer Buttons */}
               <div className="p-4 md:px-8 border-t border-neutral-200 dark:border-neutral-900 flex items-center justify-between bg-neutral-50 dark:bg-neutral-1050 flex-none font-mono">
                 <div className="flex gap-2">
-                  {activeProject.githubUrl && (
+                  {sanitizeUrl(activeProject.githubUrl) && (
                     <a
-                      href={activeProject.githubUrl}
+                      href={sanitizeUrl(activeProject.githubUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-4 py-2 border border-neutral-300 dark:border-neutral-800 text-xs text-neutral-700 dark:text-neutral-300 rounded-none hover:bg-neutral-100 dark:hover:bg-neutral-950 transition"
@@ -243,9 +253,11 @@ export default function ProjectsSection({ projects = [] }: ProjectsSectionProps)
                     </a>
                   )}
 
-                  {activeProject.demoUrl && (
+                  {sanitizeUrl(activeProject.demoUrl) && (
                     <a
-                      href={activeProject.demoUrl}
+                      href={sanitizeUrl(activeProject.demoUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-4 py-2 bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-600 dark:to-pink-600 text-white text-xs hover:opacity-90 rounded-none transition"
                     >
                       <ExternalLink className="w-3 h-3" />
