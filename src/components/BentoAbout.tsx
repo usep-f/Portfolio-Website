@@ -21,13 +21,6 @@ export default function BentoAbout() {
               My main goal is to deliver stable and highly reliable systems for every project I handle. To achieve this, my workflow is built on a simple process: I observe, plan, execute, and refine. I believe that good results only come from structured thinking, so I focus on creating detailed outlines and solid architectures before starting any work. By connecting this careful planning to my execution, I make sure that the final outcome is always secure, efficient, and meets all target goals.
             </p>
           </div>
-
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-neutral-500 dark:text-neutral-400 pt-5 border-t border-neutral-150 dark:border-neutral-900 relative z-10">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-neutral-400" />
-              <span>Philippines & Remote</span>
-            </span>
-          </div>
         </div>
 
         {/* Philosophy / Ping card (Span 1) */}

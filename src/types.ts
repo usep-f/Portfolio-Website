@@ -15,8 +15,8 @@ export interface Project {
 export interface Skill {
   name: string;
   level: number; // 0 to 100
-  category: "frontend" | "backend" | "tools" | "creative";
-  iconName: string;
+  category: "frontend" | "backend" | "languages" | "misc";
+  icon?: string;
 }
 
 export interface ContactSubmission {

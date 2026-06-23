@@ -1,14 +1,16 @@
 import React, { useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Mail, Phone, MapPin, Globe, Printer, Briefcase, GraduationCap, Award } from "lucide-react";
-import { TIMELINE, SKILLS } from "../data";
+import { Skill, TimelineItem } from "../types";
 
 interface ResumeModalProps {
   isOpen: boolean;
   onClose: () => void;
+  skills?: Skill[];
+  timeline?: TimelineItem[];
 }
 
-export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
+export default function ResumeModal({ isOpen, onClose, skills = [], timeline = [] }: ResumeModalProps) {
   const resumeRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -140,7 +142,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                   <Award className="w-3.5 h-3.5 text-neutral-400" /> TECHNICAL STACK MATRIX
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {SKILLS.map((sk) => (
+                  {skills.map((sk) => (
                     <span
                       key={sk.name}
                       className="text-[10px] px-3 py-1.5 bg-neutral-50 dark:bg-neutral-1050 border border-neutral-200 dark:border-neutral-900 font-mono text-neutral-700 dark:text-neutral-300"
@@ -160,7 +162,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                   </h2>
                   
                   <div className="border-l border-neutral-200 dark:border-neutral-900 pl-4 space-y-8">
-                    {TIMELINE.filter(item => item.type === "work").map((job, idx) => (
+                    {timeline.filter(item => item.type === "work").map((job, idx) => (
                       <div key={idx} className="relative space-y-1">
                         {/* Dot */}
                         <div className="absolute -left-[21px] top-1.5 w-2 h-2 bg-neutral-950 dark:bg-pink-400 rounded-none" />
@@ -189,7 +191,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                       <GraduationCap className="w-3.5 h-3.5 text-neutral-400" /> ACADEMIC SYSTEM
                     </h2>
                     <div className="space-y-6">
-                      {TIMELINE.filter(item => item.type === "education").map((edu, idx) => (
+                      {timeline.filter(item => item.type === "education").map((edu, idx) => (
                         <div key={idx} className="space-y-1.5">
                           <span className="text-[10px] font-mono px-2 py-0.5 bg-neutral-100 dark:bg-neutral-900 text-neutral-550 dark:text-neutral-400">
                             {edu.year}

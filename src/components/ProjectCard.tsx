@@ -2,13 +2,16 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowUpRight, Github, CheckCircle2, ChevronRight, X, ExternalLink, Code } from "lucide-react";
 import { Project } from "../types";
-import { PROJECTS } from "../data";
 
-export default function ProjectsSection() {
+interface ProjectsSectionProps {
+  projects?: Project[];
+}
+
+export default function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<"all" | "frontend" | "fullstack" | "creative">("all");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
 
-  const filteredProjects = PROJECTS.filter(
+  const filteredProjects = projects.filter(
     (proj) => selectedCategory === "all" || proj.category === selectedCategory
   );
 
@@ -108,7 +111,7 @@ export default function ProjectsSection() {
 
                 {/* Tech Highlights Tag line */}
                 <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-900">
-                  {project.tags.slice(0, 3).map((tag) => (
+                  {(project.tags || []).slice(0, 3).map((tag) => (
                     <span key={tag} className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">
                       #{tag}
                     </span>
@@ -199,7 +202,7 @@ export default function ProjectsSection() {
                     Project Deliverables & Milestones
                   </h5>
                   <div className="space-y-3">
-                    {activeProject.highlights.map((hlt, idx) => (
+                    {(activeProject.highlights || []).map((hlt, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 text-xs text-neutral-600 dark:text-neutral-400">
                         <span className="text-neutral-950 dark:text-pink-400 font-mono text-[10px] translate-y-0.5">[{idx + 1}]</span>
                         <span className="font-sans leading-relaxed">{hlt}</span>
@@ -214,7 +217,7 @@ export default function ProjectsSection() {
                     Integration Stack
                   </h5>
                   <div className="flex flex-wrap gap-2">
-                    {activeProject.tags.map((tag) => (
+                    {(activeProject.tags || []).map((tag) => (
                       <span
                         key={tag}
                         className="text-[10px] font-mono px-3 py-1 bg-neutral-50 dark:bg-neutral-950 text-neutral-700 dark:text-neutral-350 border border-neutral-200 dark:border-neutral-900"
