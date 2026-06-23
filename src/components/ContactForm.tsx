@@ -66,6 +66,10 @@ export default function ContactForm() {
       return;
     }
 
+    // Honeypot spam check
+    const formEl = e.target as HTMLFormElement;
+    const botcheck = (formEl.elements.namedItem("botcheck") as HTMLInputElement)?.checked || false;
+
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
@@ -82,6 +86,7 @@ export default function ContactForm() {
           message: formData.message,
           service: formData.service,
           budget: formData.budget,
+          botcheck: botcheck
         })
       });
 
@@ -138,6 +143,15 @@ export default function ContactForm() {
             onSubmit={handleSubmit}
             className="space-y-6"
           >
+            {/* Honeypot spam check - invisible to users */}
+            <input
+              type="checkbox"
+              name="botcheck"
+              className="hidden"
+              style={{ display: "none" }}
+              tabIndex={-1}
+              autoComplete="off"
+            />
             {submitError && (
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
