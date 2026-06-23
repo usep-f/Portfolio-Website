@@ -2,13 +2,26 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowUpRight, Github, CheckCircle2, ChevronRight, X, ExternalLink, Code } from "lucide-react";
 import { Project } from "../types";
-import { PROJECTS } from "../data";
 
-export default function ProjectsSection() {
+function sanitizeUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower.startsWith("http://") || lower.startsWith("https://")) {
+    return trimmed;
+  }
+  return undefined;
+}
+
+interface ProjectsSectionProps {
+  projects?: Project[];
+}
+
+export default function ProjectsSection({ projects = [] }: ProjectsSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<"all" | "frontend" | "fullstack" | "creative">("all");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
 
-  const filteredProjects = PROJECTS.filter(
+  const filteredProjects = projects.filter(
     (proj) => selectedCategory === "all" || proj.category === selectedCategory
   );
 
@@ -50,15 +63,11 @@ export default function ProjectsSection() {
       </div>
 
       {/* Grid mapping */}
-      <motion.div 
-        layout
-        className="grid grid-cols-1 md:grid-cols-2 gap-8"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <AnimatePresence mode="popLayout">
           {filteredProjects.map((project, index) => (
             <motion.div
-              layout
-              key={project.id}
+              key={`${selectedCategory}-${project.id}`}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 15 }}
@@ -112,7 +121,7 @@ export default function ProjectsSection() {
 
                 {/* Tech Highlights Tag line */}
                 <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-900">
-                  {project.tags.slice(0, 3).map((tag) => (
+                  {(project.tags || []).slice(0, 3).map((tag) => (
                     <span key={tag} className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">
                       #{tag}
                     </span>
@@ -132,7 +141,7 @@ export default function ProjectsSection() {
             </motion.div>
           ))}
         </AnimatePresence>
-      </motion.div>
+      </div>
 
       {/* Detail Showcase Lightbox Modal */}
       <AnimatePresence>
@@ -203,7 +212,7 @@ export default function ProjectsSection() {
                     Project Deliverables & Milestones
                   </h5>
                   <div className="space-y-3">
-                    {activeProject.highlights.map((hlt, idx) => (
+                    {(activeProject.highlights || []).map((hlt, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 text-xs text-neutral-600 dark:text-neutral-400">
                         <span className="text-neutral-950 dark:text-pink-400 font-mono text-[10px] translate-y-0.5">[{idx + 1}]</span>
                         <span className="font-sans leading-relaxed">{hlt}</span>
@@ -218,7 +227,7 @@ export default function ProjectsSection() {
                     Integration Stack
                   </h5>
                   <div className="flex flex-wrap gap-2">
-                    {activeProject.tags.map((tag) => (
+                    {(activeProject.tags || []).map((tag) => (
                       <span
                         key={tag}
                         className="text-[10px] font-mono px-3 py-1 bg-neutral-50 dark:bg-neutral-950 text-neutral-700 dark:text-neutral-350 border border-neutral-200 dark:border-neutral-900"
@@ -233,9 +242,9 @@ export default function ProjectsSection() {
               {/* Footer Buttons */}
               <div className="p-4 md:px-8 border-t border-neutral-200 dark:border-neutral-900 flex items-center justify-between bg-neutral-50 dark:bg-neutral-1050 flex-none font-mono">
                 <div className="flex gap-2">
-                  {activeProject.githubUrl && (
+                  {sanitizeUrl(activeProject.githubUrl) && (
                     <a
-                      href={activeProject.githubUrl}
+                      href={sanitizeUrl(activeProject.githubUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-4 py-2 border border-neutral-300 dark:border-neutral-800 text-xs text-neutral-700 dark:text-neutral-300 rounded-none hover:bg-neutral-100 dark:hover:bg-neutral-950 transition"
@@ -244,9 +253,11 @@ export default function ProjectsSection() {
                     </a>
                   )}
 
-                  {activeProject.demoUrl && (
+                  {sanitizeUrl(activeProject.demoUrl) && (
                     <a
-                      href={activeProject.demoUrl}
+                      href={sanitizeUrl(activeProject.demoUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-4 py-2 bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-600 dark:to-pink-600 text-white text-xs hover:opacity-90 rounded-none transition"
                     >
                       <ExternalLink className="w-3 h-3" />

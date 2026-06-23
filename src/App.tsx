@@ -5,83 +5,14 @@ import {
   Moon,
   Github,
   Linkedin,
-  Twitter,
   FileText,
-  Mail,
-  Code,
-  Sparkles,
-  Award,
-  CircleCheck,
   ChevronRight,
-  Terminal,
   Heart,
-  ExternalLink,
-  Laptop,
-  ArrowUp,
-  Atom,
-  FileCode,
-  Palette,
-  Flame,
-  Layers,
-  Server,
-  Webhook,
-  Database,
-  HardDrive,
-  Zap,
-  Boxes,
-  GitBranch,
-  Globe,
-  PenTool,
-  Brush,
-  Gauge
+  ArrowUp
 } from "lucide-react";
-import { SKILLS, TIMELINE } from "./data";
-
-const skillIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  ReactIcon: Atom,
-  TypeScriptIcon: FileCode,
-  TailwindIcon: Palette,
-  MotionIcon: Flame,
-  NextIcon: Layers,
-  NodeIcon: Server,
-  ApiIcon: Webhook,
-  SqlIcon: Database,
-  DbIcon: HardDrive,
-  ViteIcon: Zap,
-  DockerIcon: Boxes,
-  GitIcon: GitBranch,
-  ServerIcon: Globe,
-  FigmaIcon: PenTool,
-  DesignIcon: Brush,
-  SpeedIcon: Gauge
-};
-
-const categoryColorStyles: Record<string, { gradient: string; text: string; shadow: string; glow: string }> = {
-  frontend: {
-    gradient: "from-blue-500 to-indigo-600 dark:from-sky-400 dark:to-indigo-500",
-    text: "text-indigo-600 dark:text-indigo-400",
-    shadow: "shadow-[0_8px_20px_rgba(99,102,241,0.15)] dark:shadow-[0_8px_25px_rgba(99,102,241,0.3)]",
-    glow: "bg-indigo-500/10 dark:bg-indigo-500/15"
-  },
-  backend: {
-    gradient: "from-violet-500 to-pink-600 dark:from-violet-400 dark:to-pink-500",
-    text: "text-violet-600 dark:text-pink-400",
-    shadow: "shadow-[0_8px_20px_rgba(139,92,246,0.15)] dark:shadow-[0_8px_25px_rgba(236,72,153,0.3)]",
-    glow: "bg-violet-500/10 dark:bg-pink-500/15"
-  },
-  tools: {
-    gradient: "from-amber-500 to-orange-600 dark:from-amber-400 dark:to-orange-500",
-    text: "text-amber-600 dark:text-amber-400",
-    shadow: "shadow-[0_8px_20px_rgba(245,158,11,0.15)] dark:shadow-[0_8px_25px_rgba(245,158,11,0.3)]",
-    glow: "bg-amber-500/10 dark:bg-amber-500/15"
-  },
-  creative: {
-    gradient: "from-pink-500 to-rose-600 dark:from-pink-400 dark:to-rose-500",
-    text: "text-pink-600 dark:text-pink-400",
-    shadow: "shadow-[0_8px_20px_rgba(236,72,153,0.15)] dark:shadow-[0_8px_25px_rgba(236,72,153,0.3)]",
-    glow: "bg-pink-500/10 dark:bg-pink-500/15"
-  }
-};
+import { client } from "./sanity/client";
+import { projectsQuery, skillsQuery, timelineQuery, resumeQuery } from "./sanity/queries";
+import { Project, Skill, TimelineItem, Resume } from "./types";
 import ProjectsSection from "./components/ProjectCard";
 import ContactForm from "./components/ContactForm";
 import BentoAbout from "./components/BentoAbout";
@@ -432,10 +363,54 @@ function DynamicPurpleBubblesBackground({ isDarkMode }: BubbleProps) {
   );
 }
 
+interface CMSStatusFallbackProps {
+  error: string | null;
+  isEmpty: boolean;
+  contentType: "projects" | "experience" | "skills";
+}
+
+function CMSStatusFallback({ error, isEmpty, contentType }: CMSStatusFallbackProps) {
+  if (error) {
+    console.error(`CMS connection error while loading ${contentType}:`, error);
+  }
+
+  if (error || isEmpty) {
+    return (
+      <div className="relative p-6 md:p-8 bg-neutral-50/50 dark:bg-neutral-950/20 border border-neutral-200/50 dark:border-neutral-900/50 rounded-none overflow-hidden select-none my-6">
+        <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t-2 border-l-2 border-neutral-200 dark:border-neutral-800 z-20" />
+        <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-neutral-200 dark:border-neutral-800 z-20" />
+
+        <div className="space-y-2 py-6 text-center max-w-md mx-auto">
+          <div className="text-[9px] font-mono tracking-[0.25em] text-neutral-400 dark:text-neutral-550 uppercase">
+            / {contentType}
+          </div>
+          <h4 className="font-serif italic text-lg text-neutral-800 dark:text-neutral-250">
+            Content incoming
+          </h4>
+          <p className="text-[11px] text-neutral-400 dark:text-neutral-550 leading-normal font-sans">
+            The publisher will add content here later. Please check back shortly.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+const skillCategoryLabels: Record<string, string> = {
+  all: "All",
+  frontend: "Frontend",
+  backend: "Backend and Databases",
+  languages: "Programming Languages",
+  misc: "Misc"
+};
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
-  const [activeSkillCat, setActiveSkillCat] = useState<"all" | "frontend" | "backend" | "tools" | "creative">("all");
+  const [resumeData, setResumeData] = useState<Resume | null>(null);
+  const [activeSkillCat, setActiveSkillCat] = useState<"all" | "frontend" | "backend" | "languages" | "misc">("all");
   const [showScrollTop, setShowScrollTop] = useState(false);
   
   const [typingKey, setTypingKey] = useState(0);
@@ -499,7 +474,53 @@ export default function App() {
     }
   };
 
-  const filteredSkills = SKILLS.filter(
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [cmsError, setCmsError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchData() {
+      try {
+        setIsLoading(true);
+        const [fetchedProjects, fetchedSkills, fetchedTimeline, fetchedResume] = await Promise.all([
+          client.fetch<Project[]>(projectsQuery),
+          client.fetch<Skill[]>(skillsQuery),
+          client.fetch<TimelineItem[]>(timelineQuery),
+          client.fetch<Resume | null>(resumeQuery)
+        ]);
+
+        if (isMounted) {
+          setProjects(fetchedProjects || []);
+          const normalizedSkills = (fetchedSkills || []).map((sk: any) => ({
+            ...sk,
+            category: sk.category === "tools" ? "languages" : sk.category === "creative" ? "misc" : sk.category
+          }));
+          setSkills(normalizedSkills);
+          setTimeline(fetchedTimeline || []);
+          setResumeData(fetchedResume);
+          setCmsError(null);
+        }
+      } catch (err: any) {
+        console.error("Sanity connection error:", err);
+        if (isMounted) {
+          setCmsError(err.message || "Failed to connect to Sanity CMS");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredSkills = skills.filter(
     (sk) => activeSkillCat === "all" || sk.category === activeSkillCat
   );
 
@@ -583,7 +604,7 @@ export default function App() {
               id="view-cv-nav-btn"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>RESUME</span>
+              <span>Resume</span>
             </button>
           </div>
         </div>
@@ -621,7 +642,7 @@ export default function App() {
                   }}
                   className="text-sm md:text-base text-neutral-500 dark:text-neutral-400 max-w-2xl leading-relaxed font-sans"
                 >
-                  I shape interfaces that elevate digital interaction. I build rapid code structures on Vite, compile responsive headless client frameworks, and engineer custom dashboard systems with pristine typographic balance and responsive fidelity.
+                  I am a 4th-year Industrial Technology student from the Philippines. I build clean and responsive websites, design user interfaces, and handle hardware or network setups. I am basically a jack-of-all-trades when it comes to technology.
                 </motion.p>
               </div>
 
@@ -638,13 +659,13 @@ export default function App() {
                   className="px-6 py-3.5 bg-neutral-950 dark:bg-gradient-to-r dark:from-violet-600 dark:to-pink-600 hover:opacity-90 text-white font-mono text-[11px] tracking-[0.2em] font-bold uppercase transition shadow-md flex items-center gap-2"
                   id="cta-contact"
                 >
-                  <span>RETAIN SERVICES</span>
+                  <span>MESSAGE ME</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </a>
 
                 <div className="flex items-center gap-2">
                   <a
-                    href="https://github.com"
+                    href="https://github.com/usep-f"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-3 border border-neutral-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700 text-neutral-500 hover:text-neutral-950 dark:hover:text-white transition"
@@ -654,7 +675,7 @@ export default function App() {
                     <Github className="w-4 h-4" />
                   </a>
                   <a
-                    href="https://linkedin.com"
+                    href="https://www.linkedin.com/in/joseph-umali-7239733a9/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-3 border border-neutral-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700 text-neutral-500 hover:text-neutral-950 dark:hover:text-white transition"
@@ -662,16 +683,6 @@ export default function App() {
                     aria-label="LinkedIn"
                   >
                     <Linkedin className="w-4 h-4" />
-                  </a>
-                  <a
-                    href="https://twitter.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 border border-neutral-200 dark:border-neutral-900 hover:border-neutral-400 dark:hover:border-neutral-700 text-neutral-500 hover:text-neutral-950 dark:hover:text-white transition"
-                    id="social-twitter-hero"
-                    aria-label="X Network"
-                  >
-                    <Twitter className="w-4 h-4" />
                   </a>
                 </div>
               </motion.div>
@@ -695,7 +706,7 @@ export default function App() {
                 <div className="overflow-hidden aspect-square border border-neutral-100 dark:border-neutral-900 relative">
                   <img 
                     src={heroImage}
-                    alt="Joseph Umali, Lead UI Architect"
+                    alt="Joseph Umali"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover"
                   />
@@ -703,7 +714,7 @@ export default function App() {
                 </div>
 
                 <div className="pt-2 flex items-center justify-between font-mono text-[9px] text-neutral-400 dark:text-neutral-500 tracking-wider">
-                  <span>[REF_PORTRAIT_01]</span>
+                  <span>[MY_PHOTO]</span>
                   <span className="flex items-center gap-1">
                     <span className="w-1 h-1 bg-pink-500 rounded-full animate-ping" />
                   </span>
@@ -732,7 +743,7 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Creative Philosophy & Criteria
+              How I Work
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -760,7 +771,7 @@ export default function App() {
             className="space-y-1.5 pt-8 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              More than just development
+              Other Skills I Have
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -800,7 +811,7 @@ export default function App() {
           >
             <div className="space-y-1.5">
               <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-                Selected Work & Headless Solutions
+                Featured Projects
               </h3>
             </div>
             <motion.div 
@@ -817,7 +828,11 @@ export default function App() {
               visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
             }}
           >
-            <ProjectsSection />
+            {cmsError || projects.length === 0 ? (
+              <CMSStatusFallback error={cmsError} isEmpty={projects.length === 0} contentType="projects" />
+            ) : (
+              <ProjectsSection projects={projects} />
+            )}
           </motion.div>
         </motion.section>
 
@@ -840,7 +855,7 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Engineered Stack & Standards
+              My Tech Stack
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -858,7 +873,7 @@ export default function App() {
             }}
             className="flex flex-wrap gap-2 pt-2"
           >
-            {(["all", "frontend", "backend", "tools", "creative"] as const).map((cat) => (
+            {(["all", "frontend", "backend", "languages", "misc"] as const).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveSkillCat(cat)}
@@ -869,7 +884,7 @@ export default function App() {
                 }`}
                 id={`sk-tab-${cat}`}
               >
-                {cat}
+                {skillCategoryLabels[cat]}
               </button>
             ))}
           </motion.div>
@@ -883,7 +898,11 @@ export default function App() {
             className="mt-16 md:mt-24 -mb-10 md:-mb-16 overflow-visible"
             id="skills-badges-list"
           >
-            <DynamicOrbitCarousel activeSkillCat={activeSkillCat} isDarkMode={isDarkMode} />
+            {cmsError || skills.length === 0 ? (
+              <CMSStatusFallback error={cmsError} isEmpty={skills.length === 0} contentType="skills" />
+            ) : (
+              <DynamicOrbitCarousel activeSkillCat={activeSkillCat} isDarkMode={isDarkMode} skills={skills} />
+            )}
           </motion.div>
         </motion.section>
 
@@ -905,7 +924,7 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Timeline of Shipped Value
+              My Experience
             </h3>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -915,65 +934,69 @@ export default function App() {
             />
           </motion.div>
 
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.15 } }
-            }}
-            className="relative space-y-8 md:space-y-12 pb-10 mt-8"
-          >
-            {/* The Vertical Line: Left-aligned on mobile, Centered on md+ */}
-            <div className="absolute top-0 bottom-0 left-[15px] md:left-1/2 md:-translate-x-1/2 w-[2px] bg-gradient-to-b from-violet-500/50 via-pink-500/50 to-transparent" />
+          {cmsError || timeline.length === 0 ? (
+            <CMSStatusFallback error={cmsError} isEmpty={timeline.length === 0} contentType="experience" />
+          ) : (
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.15 } }
+              }}
+              className="relative space-y-8 md:space-y-12 pb-10 mt-8"
+            >
+              {/* The Vertical Line: Left-aligned on mobile, Centered on md+ */}
+              <div className="absolute top-0 bottom-0 left-[15px] md:left-1/2 md:-translate-x-1/2 w-[2px] bg-gradient-to-b from-violet-500/50 via-pink-500/50 to-transparent" />
 
-            {TIMELINE.map((step, idx) => {
-              const isEven = idx % 2 === 0;
-              return (
-                <div key={idx} className={`relative flex flex-col md:flex-row items-start md:items-center w-full ${isEven ? 'md:flex-row-reverse' : ''}`}>
-                  
-                  {/* Visual Marker Dot */}
-                  <div className="absolute left-[15px] md:left-1/2 -translate-x-1/2 mt-[28px] md:mt-0 w-4 h-4 bg-white dark:bg-[#0c0c0c] border-2 border-pink-500 dark:border-pink-400 z-10 flex items-center justify-center rounded-none shadow-[0_0_10px_rgba(236,72,153,0.5)]">
-                    <div className="w-1.5 h-1.5 bg-neutral-950 dark:bg-white rounded-none" />
-                  </div>
-
-                  {/* Empty Spacer for alternating side on md+ */}
-                  <div className="hidden md:block md:w-1/2" />
-
-                  {/* Content Card Container */}
-                  <motion.div 
-                    variants={{
-                      hidden: { opacity: 0, x: isEven ? -40 : 40, y: 10 },
-                      visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-                    }}
-                    className={`w-full md:w-1/2 pl-12 md:pl-0 ${isEven ? 'md:pr-12 md:text-right' : 'md:pl-12 text-left'}`}
-                  >
-                    <div className="relative group bg-white/70 dark:bg-[#0c0c0c]/70 backdrop-blur-md border border-neutral-200 dark:border-neutral-900 p-6 md:p-8 hover:scale-[1.02] hover:border-pink-500/30 dark:hover:border-pink-400/30 transition-all duration-300 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgba(236,72,153,0.05)] rounded-none overflow-hidden">
-                      {/* Editorial Corners */}
-                      <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t-2 border-l-2 border-neutral-900 dark:border-pink-400 z-20 transition-colors" />
-                      <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-neutral-900 dark:border-pink-400 z-20 transition-colors" />
-
-                      <div className={`flex flex-col gap-2 relative z-10 ${isEven ? 'md:items-end' : 'items-start'}`}>
-                        <span className="inline-flex items-center justify-center text-[10px] font-mono text-neutral-400 dark:text-neutral-500 tracking-[0.1em] px-2 py-0.5 bg-neutral-100 dark:bg-neutral-950/50 border border-neutral-200 dark:border-neutral-800">
-                          {step.year} // CHRONO
-                        </span>
-
-                        <h4 className="font-serif text-xl text-neutral-950 dark:text-white font-normal mt-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
-                          {step.role}
-                        </h4>
-
-                        <div className="text-[11px] font-mono text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 uppercase tracking-widest font-bold">
-                          {step.company}
-                        </div>
-
-                        <p className={`text-xs text-neutral-500 dark:text-neutral-400 mt-2 leading-relaxed font-sans max-w-sm ${isEven ? 'md:text-right' : 'text-left'}`}>
-                          {step.description}
-                        </p>
-                      </div>
+              {timeline.map((step, idx) => {
+                const isEven = idx % 2 === 0;
+                return (
+                  <div key={idx} className={`relative flex flex-col md:flex-row items-start md:items-center w-full ${isEven ? 'md:flex-row-reverse' : ''}`}>
+                    
+                    {/* Visual Marker Dot */}
+                    <div className="absolute left-[15px] md:left-1/2 -translate-x-1/2 mt-[28px] md:mt-0 w-4 h-4 bg-white dark:bg-[#0c0c0c] border-2 border-pink-500 dark:border-pink-400 z-10 flex items-center justify-center rounded-none shadow-[0_0_10px_rgba(236,72,153,0.5)]">
+                      <div className="w-1.5 h-1.5 bg-neutral-950 dark:bg-white rounded-none" />
                     </div>
-                  </motion.div>
-                </div>
-              );
-            })}
-          </motion.div>
+
+                    {/* Empty Spacer for alternating side on md+ */}
+                    <div className="hidden md:block md:w-1/2" />
+
+                    {/* Content Card Container */}
+                    <motion.div 
+                      variants={{
+                        hidden: { opacity: 0, x: isEven ? -40 : 40, y: 10 },
+                        visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+                      }}
+                      className={`w-full md:w-1/2 pl-12 md:pl-0 ${isEven ? 'md:pr-12 md:text-right' : 'md:pl-12 text-left'}`}
+                    >
+                      <div className="relative group bg-white/70 dark:bg-[#0c0c0c]/70 backdrop-blur-md border border-neutral-200 dark:border-neutral-900 p-6 md:p-8 hover:scale-[1.02] hover:border-pink-500/30 dark:hover:border-pink-400/30 transition-all duration-300 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgba(236,72,153,0.05)] rounded-none overflow-hidden">
+                        {/* Editorial Corners */}
+                        <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t-2 border-l-2 border-neutral-900 dark:border-pink-400 z-20 transition-colors" />
+                        <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-neutral-900 dark:border-pink-400 z-20 transition-colors" />
+
+                        <div className={`flex flex-col gap-2 relative z-10 ${isEven ? 'md:items-end' : 'items-start'}`}>
+                          <span className="inline-flex items-center justify-center text-[10px] font-mono text-neutral-400 dark:text-neutral-555 tracking-[0.1em] px-2 py-0.5 bg-neutral-100 dark:bg-neutral-950/50 border border-neutral-200 dark:border-neutral-800">
+                            {step.year} // CHRONO
+                          </span>
+
+                          <h4 className="font-serif text-xl text-neutral-950 dark:text-white font-normal mt-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                            {step.role}
+                          </h4>
+
+                          <div className="text-[11px] font-mono text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-500 dark:from-violet-400 dark:to-pink-400 uppercase tracking-widest font-bold">
+                            {step.company}
+                          </div>
+
+                          <p className={`text-xs text-neutral-500 dark:text-neutral-400 mt-2 leading-relaxed font-sans max-w-sm ${isEven ? 'md:text-right' : 'text-left'}`}>
+                            {step.description}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
         </motion.section>
 
         {/* CONTACT GATHERING FORM BOX */}
@@ -995,10 +1018,10 @@ export default function App() {
             className="space-y-1.5 pb-4 relative"
           >
             <h3 className="text-2xl font-serif italic text-neutral-950 dark:text-white">
-              Initiate Dynamic Project Sprints
+              Get in Touch
             </h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-xl leading-relaxed pt-1 font-sans">
-              Outline specific deliverables, performance objectives, and legacy parameters below. I will analyze targets and initiate a follow-up briefing within the next cycle.
+              Feel free to send me a message if you need help with a website, a hardware fix, or a design layout. I will review it and get back to you as soon as I can.
             </p>
             <motion.div 
               initial={{ scaleX: 0 }}
@@ -1028,11 +1051,10 @@ export default function App() {
           </div>
 
           <div className="flex space-x-3">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">GitHub</a>
+            <a href="https://github.com/usep-f" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">GitHub</a>
             <span>//</span>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/joseph-umali-7239733a9/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">LinkedIn</a>
             <span>//</span>
-            <a href="#about-section" className="hover:text-pink-500 transition">Top</a>
           </div>
         </footer>
 
@@ -1061,7 +1083,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* FULL RESUME INTERACTIVE DIALOG BOX */}
-      <ResumeModal isOpen={isResumeOpen} onClose={() => setIsResumeOpen(false)} />
+      <ResumeModal isOpen={isResumeOpen} onClose={() => setIsResumeOpen(false)} pdfUrl={resumeData?.pdfUrl || ""} />
 
     </div>
   );

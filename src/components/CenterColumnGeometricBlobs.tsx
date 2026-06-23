@@ -20,7 +20,7 @@ interface BlobConfig {
 const BLOBS_DATA: BlobConfig[] = [
   {
     id: 1,
-    top: "2%",
+    top: "150px",
     left: "-8%",
     size: "w-44 h-44 md:w-64 md:h-64",
     gradient: "from-violet-500/22 via-fuchsia-500/18 to-pink-500/22",
@@ -34,7 +34,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 2,
-    top: "9%",
+    top: "550px",
     right: "-10%",
     size: "w-40 h-40 md:w-56 md:h-56",
     gradient: "from-pink-500/20 via-purple-500/15 to-violet-500/20",
@@ -48,7 +48,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 3,
-    top: "16%",
+    top: "1000px",
     left: "-12%",
     size: "w-48 h-48 md:w-68 md:h-68",
     gradient: "from-purple-600/25 via-pink-500/20 to-violet-500/15",
@@ -62,7 +62,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 4,
-    top: "24%",
+    top: "1500px",
     right: "-8%",
     size: "w-36 h-36 md:w-52 md:h-52",
     gradient: "from-pink-600/22 via-violet-500/18 to-fuchsia-500/22",
@@ -76,7 +76,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 5,
-    top: "32%",
+    top: "2000px",
     left: "-9%",
     size: "w-44 h-44 md:w-60 md:h-60",
     gradient: "from-violet-500/22 via-pink-500/18 to-purple-600/22",
@@ -90,7 +90,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 6,
-    top: "40%",
+    top: "2500px",
     right: "-12%",
     size: "w-48 h-48 md:w-64 md:h-64",
     gradient: "from-purple-500/25 via-fuchsia-500/18 to-pink-500/25",
@@ -104,7 +104,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 7,
-    top: "49%",
+    top: "3000px",
     left: "-11%",
     size: "w-52 h-52 md:w-72 md:h-72",
     gradient: "from-pink-500/22 via-purple-600/22 to-violet-500/18",
@@ -118,7 +118,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 8,
-    top: "57%",
+    top: "3500px",
     right: "-7%",
     size: "w-40 h-40 md:w-56 md:h-56",
     gradient: "from-violet-600/20 via-pink-400/20 to-fuchsia-500/22",
@@ -132,7 +132,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 9,
-    top: "66%",
+    top: "4100px",
     left: "-12%",
     size: "w-46 h-46 md:w-66 md:h-66",
     gradient: "from-fuchsia-600/24 via-purple-500/18 to-pink-500/24",
@@ -146,7 +146,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 10,
-    top: "74%",
+    top: "4600px",
     right: "-10%",
     size: "w-44 h-44 md:w-60 md:h-60",
     gradient: "from-pink-500/22 via-violet-600/18 to-purple-500/22",
@@ -160,7 +160,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 11,
-    top: "82%",
+    top: "5100px",
     left: "-8%",
     size: "w-40 h-40 md:w-56 md:h-56",
     gradient: "from-violet-500/22 via-pink-500/20 to-fuchsia-600/22",
@@ -174,7 +174,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 12,
-    top: "89%",
+    top: "5600px",
     right: "-9%",
     size: "w-48 h-48 md:w-68 md:h-68",
     gradient: "from-purple-600/25 via-pink-500/20 to-violet-500/22",
@@ -188,7 +188,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 13,
-    top: "95%",
+    top: "6000px",
     left: "-12%",
     size: "w-44 h-44 md:w-64 md:h-64",
     gradient: "from-pink-600/24 via-purple-600/18 to-violet-500/20",
@@ -202,7 +202,7 @@ const BLOBS_DATA: BlobConfig[] = [
   },
   {
     id: 14,
-    top: "98%",
+    top: "6200px",
     right: "-11%",
     size: "w-36 h-36 md:w-48 md:h-48",
     gradient: "from-violet-500/24 via-fuchsia-500/20 to-pink-500/24",
@@ -270,7 +270,7 @@ export default function CenterColumnGeometricBlobs() {
           <motion.div
             className="absolute rounded-full w-5 h-5 md:w-7 md:h-7 bg-gradient-to-br from-pink-500/30 to-violet-500/30 border border-white/15 shadow-md"
             style={{
-              top: `calc(${blob.top} + 4%)`,
+              top: `calc(${blob.top} + 80px)`,
               left: blob.left ? `calc(${blob.left} + 12%)` : undefined,
               right: blob.right ? `calc(${blob.right} + 12%)` : undefined,
             }}

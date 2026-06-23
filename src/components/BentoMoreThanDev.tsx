@@ -27,7 +27,7 @@ export default function BentoMoreThanDev() {
               PC Repair & Maintenance
             </h4>
             <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans mt-2 max-w-sm">
-              Extensive hands-on experience diagnosing hardware issues, replacing components, performing thermal repastes, optimizing cooling systems, and executing deep system cleaning to prolong the lifespan of consumer and enterprise machines.
+              I have hands-on experience fixing computers. I diagnose hardware issues, replace broken parts, clean systems, apply thermal paste, and make sure desktops or laptops do not overheat.
             </p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function BentoMoreThanDev() {
               UI/UX Design
             </h4>
             <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans mt-2">
-              Wireframing, prototyping, and crafting high-fidelity interface designs utilizing tools like Figma. Specializing in conversion-optimized landing pages, intuitive dashboards, and comprehensive design systems.
+              I design user interfaces and wireframes using Figma. I focus on making layouts that are easy for visitors to navigate, clean, and professional.
             </p>
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function BentoMoreThanDev() {
               Networking
             </h4>
             <p className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-              LAN/WAN configurations, router/switch setups, cable management, and troubleshooting network latency for seamless connectivity.
+              I configure local area networks (LAN), set up Wi-Fi routers and switches, manage ethernet cabling, and solve internet connection issues.
             </p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function BentoMoreThanDev() {
               2D & 3D CAD
             </h4>
             <p className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-              Precision drafting, architectural floor plans, mechanical part modeling, and rendering using AutoCAD and SketchUp.
+              I do technical drawing and 3D modeling using AutoCAD and SketchUp. I can create precise room plans and component drawings for designs.
             </p>
           </div>
         </div>
