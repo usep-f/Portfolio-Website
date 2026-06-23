@@ -88,7 +88,7 @@ export default function ResumeModal({ isOpen, onClose, pdfUrl = "" }: ResumeModa
                     CV PDF not uploaded
                   </h4>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm">
-                    Please upload your CV in PDF format via the Sanity Studio to view it here.
+                    Publisher has not yet uploaded their CV File.
                   </p>
                 </div>
               </div>

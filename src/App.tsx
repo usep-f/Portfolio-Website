@@ -1051,11 +1051,10 @@ export default function App() {
           </div>
 
           <div className="flex space-x-3">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">GitHub</a>
+            <a href="https://github.com/usep-f" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">GitHub</a>
             <span>//</span>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/joseph-umali-7239733a9/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition">LinkedIn</a>
             <span>//</span>
-            <a href="#about-section" className="hover:text-pink-500 transition">Top</a>
           </div>
         </footer>
 
