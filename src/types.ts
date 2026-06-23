@@ -36,3 +36,8 @@ export interface TimelineItem {
   description: string;
   type: "work" | "education";
 }
+
+export interface Resume {
+  title: string;
+  pdfUrl: string;
+}

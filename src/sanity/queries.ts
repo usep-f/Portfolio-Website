@@ -26,3 +26,8 @@ export const timelineQuery = `*[_type == "timelineItem"] | order(_createdAt asc)
   description,
   type
 }`;
+
+export const resumeQuery = `*[_type == "resume"][0] {
+  title,
+  "pdfUrl": coalesce(pdfFile.asset->url, "")
+}`;

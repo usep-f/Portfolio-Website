@@ -11,8 +11,8 @@ import {
   ArrowUp
 } from "lucide-react";
 import { client } from "./sanity/client";
-import { projectsQuery, skillsQuery, timelineQuery } from "./sanity/queries";
-import { Project, Skill, TimelineItem } from "./types";
+import { projectsQuery, skillsQuery, timelineQuery, resumeQuery } from "./sanity/queries";
+import { Project, Skill, TimelineItem, Resume } from "./types";
 import ProjectsSection from "./components/ProjectCard";
 import ContactForm from "./components/ContactForm";
 import BentoAbout from "./components/BentoAbout";
@@ -409,6 +409,7 @@ const skillCategoryLabels: Record<string, string> = {
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const [resumeData, setResumeData] = useState<Resume | null>(null);
   const [activeSkillCat, setActiveSkillCat] = useState<"all" | "frontend" | "backend" | "languages" | "misc">("all");
   const [showScrollTop, setShowScrollTop] = useState(false);
   
@@ -484,10 +485,11 @@ export default function App() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const [fetchedProjects, fetchedSkills, fetchedTimeline] = await Promise.all([
+        const [fetchedProjects, fetchedSkills, fetchedTimeline, fetchedResume] = await Promise.all([
           client.fetch<Project[]>(projectsQuery),
           client.fetch<Skill[]>(skillsQuery),
-          client.fetch<TimelineItem[]>(timelineQuery)
+          client.fetch<TimelineItem[]>(timelineQuery),
+          client.fetch<Resume | null>(resumeQuery)
         ]);
 
         if (isMounted) {
@@ -498,6 +500,7 @@ export default function App() {
           }));
           setSkills(normalizedSkills);
           setTimeline(fetchedTimeline || []);
+          setResumeData(fetchedResume);
           setCmsError(null);
         }
       } catch (err: any) {
@@ -1081,7 +1084,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* FULL RESUME INTERACTIVE DIALOG BOX */}
-      <ResumeModal isOpen={isResumeOpen} onClose={() => setIsResumeOpen(false)} skills={skills} timeline={timeline} />
+      <ResumeModal isOpen={isResumeOpen} onClose={() => setIsResumeOpen(false)} pdfUrl={resumeData?.pdfUrl || ""} />
 
     </div>
   );
